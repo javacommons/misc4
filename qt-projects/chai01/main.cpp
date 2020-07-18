@@ -1,7 +1,7 @@
 #include "mychaiscript.hpp"
 
 #include <string>
-#include "../strconv2.hpp"
+#include "strconv2.hpp"
 
 class Person {
 public:
@@ -15,7 +15,7 @@ public:
         printf("~Person()\n"); fflush(stdout);
     }
     std::string to_string() const {
-        return strconv::sprintf("Person(人) { name=%s, age=%d }", name.c_str(), age);
+        return strconv::format("Person(人) { name=%s, age=%d }", name.c_str(), age);
     }
 };
 
