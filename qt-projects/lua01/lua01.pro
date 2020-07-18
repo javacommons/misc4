@@ -13,8 +13,8 @@ HEADERS += \
 SOURCES += \
     main.cpp
 
-INCLUDEPATH += $$PWD/../lua-binary/trunk/lib/luajit-$${QMAKE_HOST.arch}
-QMAKE_LIBDIR += $$PWD/../lua-binary/trunk/lib/luajit-$${QMAKE_HOST.arch}
+INCLUDEPATH += $$PWD/../lua-binary/lib/luajit-$${QMAKE_HOST.arch}
+QMAKE_LIBDIR += $$PWD/../lua-binary/lib/luajit-$${QMAKE_HOST.arch}
 LIBS += -lluajit
 
 CONFIG += file_copies
