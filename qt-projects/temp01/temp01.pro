@@ -8,3 +8,7 @@ INCLUDEPATH += $$PWD/../common
 
 SOURCES += \
         main.cpp
+
+copy_debug.commands = $(COPY_DIR) $$shell_path($$PWD/dark.*) $$shell_path($$OUT_PWD/debug)
+copy_release.commands = $(COPY_DIR) $$shell_path($$PWD/dark.*) $$shell_path($$OUT_PWD/release)
+QMAKE_EXTRA_TARGETS += copy_debug copy_release

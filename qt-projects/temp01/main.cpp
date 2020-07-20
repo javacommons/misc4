@@ -57,7 +57,7 @@ public slots:
 
 int main(int argc, char *argv[])
 {
-   qInstallMessageHandler(myMessageOutput);
+   //qInstallMessageHandler(myMessageOutput);
    MyApplication a(argc, argv);
 
 #if 0x1
@@ -88,6 +88,7 @@ int main(int argc, char *argv[])
     QFile dl_file(dir.filePath("msys2-i686-latest.tar.xz"));
     a.download(dl_url, dl_file);
     qInfo() << "finished!";
+    system("pause");
     return 0;
 }
 
