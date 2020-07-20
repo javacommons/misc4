@@ -1,7 +1,7 @@
 #! bash -uvx
 bash ../install-qt.sh
 bash ../install-libs.sh
-rm -rf .qmake* debug release Makefile* *_plugin_import.cpp
+rm -rf .qmake* debug release Makefile* *_plugin_import.cpp ui_*.h
 #qmake *.pro
 $MSYSTEM_PREFIX/qt5-static/bin/qmake *.pro
 mingw32-make -f Makefile.Release
