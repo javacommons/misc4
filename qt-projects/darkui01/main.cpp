@@ -60,8 +60,8 @@ int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
     qDebug() << "hello!";
-    bool b = extract_archive(R"(C:\Users\Public\home\data\msys2-i686-20180320.7z)",
-                             R"(C:\Users\Public\home\data\@out)");
+    bool b = extract_archive(R"(C:\Users\Public\home\data\minimum-cab1.cab)",
+                             R"(C:\Users\Public\home\data\@out2)");
     qDebug() << "b:" << b;
     return 0;
 }
