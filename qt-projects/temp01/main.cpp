@@ -57,8 +57,20 @@ public slots:
 
 int main(int argc, char *argv[])
 {
-   //qInstallMessageHandler(myMessageOutput);
+   qInstallMessageHandler(myMessageOutput);
    MyApplication a(argc, argv);
+
+   qDebug() << MyApplication::applicationDirPath();
+
+   QString cmd = QString("%1/dark.exe").arg(MyApplication::applicationDirPath());
+
+   qDebug() << cmd;
+
+   _wsystem(cmd.toStdWString().c_str());
+
+   system("pause");
+
+   exit(0);
 
 #if 0x1
     QTemporaryFile file(QDir::tempPath()+"/XXXXXX.zip");
