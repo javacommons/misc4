@@ -8,6 +8,7 @@ strconv::io io;
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
+    Q_UNUSED(context);
     switch (type) {
     case QtDebugMsg:
         io.printf("[Debug] %s\n", msg.toUtf8().constData());
