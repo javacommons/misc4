@@ -23,3 +23,6 @@ copy1.commands += $$makeCopyCommand($${PWD}/dark.*)
 QMAKE_EXTRA_TARGETS += copy1
 copy2.commands += $$makeCopyCommand($${PWD}/*.dll)
 QMAKE_EXTRA_TARGETS += copy2
+
+HEADERS += \
+    ../common/qtcommon.hpp

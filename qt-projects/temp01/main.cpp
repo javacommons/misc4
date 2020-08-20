@@ -4,66 +4,32 @@
 #include <QtNetwork>
 #include "strconv2.hpp"
 
-strconv::io io;
+#include "qtcommon.hpp"
 
-void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
-{
-    Q_UNUSED(context);
-    switch (type) {
-    case QtDebugMsg:
-        io.printf("[Debug] %s\n", msg.toUtf8().constData());
-        break;
-    case QtInfoMsg:
-        io.printf("[Info] %s\n", msg.toUtf8().constData());
-        break;
-    case QtWarningMsg:
-        io.printf("[Warning] %s\n", msg.toUtf8().constData());
-        break;
-    case QtCriticalMsg:
-        io.printf("[Critical] %s\n", msg.toUtf8().constData());
-        break;
-    case QtFatalMsg:
-        io.printf("[Fatal] %s\n", msg.toUtf8().constData());
-        abort();
-    }
-}
-
-class MyApplication : public QApplication {
+class My : public QApplication {
     Q_OBJECT
 public:
-    MyApplication(int &argc, char **argv) : QApplication(argc, argv) {
+    My(int &argc, char **argv) : QApplication(argc, argv) {
     }
     bool download(QUrl &url, QFile &file) {
-        QNetworkRequest req(url);
-        QNetworkAccessManager nam;
-        QNetworkReply *rep = nam.get(req);
-        connect(rep, SIGNAL(downloadProgress(qint64, qint64)),
-                this, SLOT(downloadProgress(qint64, qint64)));
-        QEventLoop loop;
-        while(!rep->isFinished()) {
-            loop.processEvents(QEventLoop::ExcludeUserInputEvents);
-        }
-        file.open(QIODevice::WriteOnly);
-        file.write(rep->readAll());
-        file.close();
-        io.printf("\n");
-        return true;
+        MyDownloader dl;
+        return dl.download(url, file);
     }
 public slots:
     void downloadProgress(qint64 bytesReceived, qint64 bytesTotal) {
         //qInfo() << bytesReceived << "/" << bytesTotal;
-        io.printf("\r%lld/%lld", bytesReceived, bytesTotal);
+        my_io.printf("\r%lld/%lld", bytesReceived, bytesTotal);
     }
 };
 
 int main(int argc, char *argv[])
 {
-   qInstallMessageHandler(myMessageOutput);
-   MyApplication a(argc, argv);
+   myInstallMessageHandler();
+   My a(argc, argv);
 
-   qDebug() << MyApplication::applicationDirPath();
+   qDebug() << My::applicationDirPath();
 
-   QString cmd = QString("%1/dark.exe").arg(MyApplication::applicationDirPath());
+   QString cmd = QString("%1/dark.exe").arg(My::applicationDirPath());
 
    qDebug() << cmd;
 
@@ -71,8 +37,9 @@ int main(int argc, char *argv[])
 
    system("pause");
 
-   exit(0);
+   //exit(0);
 
+   /*
 #if 0x1
     QTemporaryFile file(QDir::tempPath()+"/XXXXXX.zip");
 #else
@@ -85,6 +52,7 @@ int main(int argc, char *argv[])
     qDebug() << "file.fileName():" << file.fileName();
     QFile file2(file.fileName());
     qDebug() << file2.exists();
+    */
 
 #if 0x0
     QTemporaryDir dir;
@@ -95,14 +63,28 @@ int main(int argc, char *argv[])
     qDebug() << "dir.path():" << dir.path();
     QDir dir2(dir.path());
     qDebug() << dir2.exists();
+#if 0x0
     QString fpath = dir.filePath("msys2-i686-latest.tar.xz");
     qDebug() << fpath;
     QUrl dl_url("http://repo.msys2.org/distrib/msys2-i686-latest.tar.xz");
     QFile dl_file(dir.filePath("msys2-i686-latest.tar.xz"));
+#else
+    QUrl dl_url("https://aka.ms/vs/16/release/VC_redist.x86.exe");
+    QString fpath = dir.filePath("VC_redist.x86.exe");
+    qDebug() << fpath;
+    QFile dl_file(fpath);
+#endif
+    MyDownloader dl;
     a.download(dl_url, dl_file);
     qInfo() << "finished!";
     system("pause");
     return 0;
 }
+
+/*
+Microsoft Visual C++ 2015-2019 Redistributable
+https://aka.ms/vs/16/release/VC_redist.x86.exe
+https://aka.ms/vs/16/release/VC_redist.x64.exe
+ */
 
 #include "main.moc"
