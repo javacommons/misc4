@@ -76,6 +76,8 @@ int main(int argc, char *argv[])
 #endif
     MyDownloader dl;
     a.download(dl_url, dl_file);
+    QProcess proc;
+    proc.execute(cmd, QStringList() << "-x" << "@out" << fpath);
     qInfo() << "finished!";
     system("pause");
     return 0;
