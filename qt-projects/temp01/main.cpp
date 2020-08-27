@@ -78,6 +78,31 @@ int main(int argc, char *argv[])
     a.download(dl_url, dl_file);
     QProcess proc;
     proc.execute(cmd, QStringList() << "-x" << "@out" << fpath);
+    QDir out("@out");
+    QStringList filter;
+    filter << "*.cab";
+    //QDirIterator it(out.path(), filter, QDir::AllEntries | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+    QDirIterator it(out.path(),
+                    filter,
+                    QDir::AllEntries | QDir::NoSymLinks | QDir::NoDotAndDotDot,
+                    QDirIterator::Subdirectories);
+    QStringList files;
+    while (it.hasNext())
+        files << it.next();
+    files.sort();
+    qDebug() << files;
+    QString cab = files[0];
+    qDebug() << cab;
+    QProcess proc2;
+    QDir out2("@out2");
+    out2.removeRecursively();
+    out2.mkpath(out2.absolutePath());
+    QStringList args2;
+    //args2 << cab << "-F:*.*" << QDir::toNativeSeparators(out2.absolutePath());
+    args2 << cab << "-F:*.*" << out2.absolutePath();
+    qDebug() << args2;
+    proc2.execute("expand.exe", args2);
+    // EXPAND CABファイル名 -F:ファイル名 展開先
     qInfo() << "finished!";
     system("pause");
     return 0;
