@@ -58,30 +58,25 @@ int main(int argc, char *argv[])
     QTemporaryDir dir;
 #else
     QTemporaryDir dir("XXXXXX.tmp");
-    dir.setAutoRemove(false);
+    //dir.setAutoRemove(false);
+    dir.setAutoRemove(true);
 #endif
     qDebug() << "dir.path():" << dir.path();
     QDir dir2(dir.path());
     qDebug() << dir2.exists();
-#if 0x0
-    QString fpath = dir.filePath("msys2-i686-latest.tar.xz");
-    qDebug() << fpath;
-    QUrl dl_url("http://repo.msys2.org/distrib/msys2-i686-latest.tar.xz");
-    QFile dl_file(dir.filePath("msys2-i686-latest.tar.xz"));
-#else
     QUrl dl_url("https://aka.ms/vs/16/release/VC_redist.x86.exe");
-    QString fpath = dir.filePath("VC_redist.x86.exe");
-    qDebug() << fpath;
-    QFile dl_file(fpath);
-#endif
+    //QString fpath = dir.filePath("VC_redist.x86.exe");
+    QString dl_path = dir.filePath(dl_url.fileName());
+    qDebug() << dl_path;
+    QFile dl_file(dl_path);
     MyDownloader dl;
     a.download(dl_url, dl_file);
     QProcess proc;
-    proc.execute(cmd, QStringList() << "-x" << "@out" << fpath);
     QDir out("@out");
+    out.removeRecursively();
+    proc.execute(cmd, QStringList() << "-nologo" << "-x" << "@out" << dl_path);
     QStringList filter;
     filter << "*.cab";
-    //QDirIterator it(out.path(), filter, QDir::AllEntries | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
     QDirIterator it(out.path(),
                     filter,
                     QDir::AllEntries | QDir::NoSymLinks | QDir::NoDotAndDotDot,
@@ -91,20 +86,24 @@ int main(int argc, char *argv[])
         files << it.next();
     files.sort();
     qDebug() << files;
-    QString cab = files[0];
-    qDebug() << cab;
-    QProcess proc2;
+    //QString cab = files[0];
     QDir out2("@out2");
     out2.removeRecursively();
-    out2.mkpath(out2.absolutePath());
-    QStringList args2;
-    //args2 << cab << "-F:*.*" << QDir::toNativeSeparators(out2.absolutePath());
-    args2 << cab << "-F:*.*" << out2.absolutePath();
-    qDebug() << args2;
-    proc2.execute("expand.exe", args2);
-    // EXPAND CABファイル名 -F:ファイル名 展開先
+    foreach(QString cab, files) {
+        qDebug() << cab;
+        QFileInfo cabInfo(cab);
+        QFileInfo cabDirInfo(cabInfo.dir().path());
+        QString subFolder = cabDirInfo.fileName();
+        qDebug() << "subFolder=" << subFolder;
+        QProcess proc2;
+        QDir out2sub(out2.absolutePath()+"/"+subFolder);
+        out2.mkpath(out2sub.absolutePath());
+        QStringList args2;
+        args2 << cab << "-F:*.*" << out2sub.absolutePath();
+        qDebug() << args2;
+        proc2.execute("expand.exe", args2);
+    }
     qInfo() << "finished!";
-    system("pause");
     return 0;
 }
 
@@ -115,3 +114,10 @@ https://aka.ms/vs/16/release/VC_redist.x64.exe
  */
 
 #include "main.moc"
+
+#if 0x0
+    QString fpath = dir.filePath("msys2-i686-latest.tar.xz");
+    qDebug() << fpath;
+    QUrl dl_url("http://repo.msys2.org/distrib/msys2-i686-latest.tar.xz");
+    QFile dl_file(dir.filePath("msys2-i686-latest.tar.xz"));
+#endif
