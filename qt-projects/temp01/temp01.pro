@@ -26,3 +26,19 @@ QMAKE_EXTRA_TARGETS += copy2
 
 HEADERS += \
     ../common/qtcommon.hpp
+
+DISTFILES += \
+    post.sh
+
+defineReplace(makeBashCommand){
+    DEPEND_FILE = $$1
+    CONFIG(debug,debug|release){
+        APP_BUILD_DIR=$${OUT_PWD}/debug
+    }else{
+        APP_BUILD_DIR=$${OUT_PWD}/release
+    }
+    return(env SRC_DIR=$${PWD} BLD_DIR=$${APP_BUILD_DIR} bash $$DEPEND_FILE)
+}
+
+post.commands += $$makeBashCommand($${PWD}/post.sh)
+QMAKE_EXTRA_TARGETS += post
