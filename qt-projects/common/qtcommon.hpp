@@ -40,6 +40,7 @@ public:
     MyDownloader() : QObject() {
     }
     bool download(QUrl &url, QFile &file) {
+        my_io.printfW(L"Download: %s\n", url.toString().toStdWString().c_str());
         QNetworkRequest req(url);
         QNetworkAccessManager nam;
         QNetworkReply *rep = nam.get(req);
@@ -64,10 +65,12 @@ public:
         file.write(rep->readAll());
         file.close();
         my_io.printf("\n");
+        my_io.printfW(L"Downloaded: %s\n", file.fileName().toStdWString().c_str());
         return true;
     }
 public slots:
     void downloadProgress(qint64 bytesReceived, qint64 bytesTotal) {
+        if(bytesTotal == 0) return;
         my_io.printf("\r%lld/%lld", bytesReceived, bytesTotal);
     }
 };
