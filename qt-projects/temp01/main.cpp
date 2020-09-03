@@ -27,17 +27,31 @@ int main(int argc, char *argv[])
    myInstallMessageHandler();
    My a(argc, argv);
 
-   qDebug() << My::applicationDirPath();
+   qDebug() << QDir::currentPath();
 
-   QString cmd = QString("%1/dark.exe").arg(My::applicationDirPath());
+   qDebug() << a.arguments().size();
+   qDebug() << a.arguments();
+
+   qDebug() << a.applicationFilePath();
+
+   qDebug() << a.applicationDirPath();
+
+   QString cmd = QString("%1/dark.exe").arg(a.applicationDirPath());
 
    qDebug() << cmd;
 
-   _wsystem(cmd.toStdWString().c_str());
+   //_wsystem(cmd.toStdWString().c_str());
 
-   system("pause");
+   //system("pause");
 
    //exit(0);
+
+   if(a.arguments().size() < 3) {
+       system("pause");
+       QProcess self;
+       QDir out3("@out3");
+       return self.execute(a.applicationFilePath(), QStringList() << "vs2019" << out3.absolutePath());
+   }
 
    /*
 #if 0x1
@@ -87,7 +101,8 @@ int main(int argc, char *argv[])
     files.sort();
     qDebug() << files;
     //QString cab = files[0];
-    QDir out2("@out2");
+    //QDir out2("@out2");
+    QDir out2(a.arguments()[2]);
     out2.removeRecursively();
     foreach(QString cab, files) {
         qDebug() << cab;
