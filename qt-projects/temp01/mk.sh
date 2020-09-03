@@ -8,5 +8,7 @@ rm release/*.h
 rm release/*.cpp
 rm release/*.moc
 rm release/*.o
-mkdir -p release/output
-/c/Users/Public/install/BoxedAppPacker_2020_5_0_0/BoxedAppPackerConsole.exe temp01.bxproj | iconv -f cp932 -t utf-8
+#mkdir -p release/output
+BoxedAppPackerConsole.exe temp01.bxproj | iconv -f cp932 -t utf-8
+cp -p release/temp01.exe .
+

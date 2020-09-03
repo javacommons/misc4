@@ -1,8 +1,8 @@
 QT += gui network widgets
-
 CONFIG += c++11 console
-
 DEFINES += QT_DEPRECATED_WARNINGS
+
+TARGET = $$TARGET-$${QMAKE_HOST.arch}
 
 INCLUDEPATH += $$PWD/../common
 
