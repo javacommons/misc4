@@ -20,10 +20,9 @@ repositories {
 dependencies {
     testCompile 'junit:junit:4.12'
 
-    // https://mvnrepository.com/artifact/org.eclipse.swt/org.eclipse.swt.win32.win32.x86_64
+    // https://mvnrepository.com/artifact/org.eclipse.swt/org.eclipse.swt.win32.win32.x86_64 (SWT-64bit)
     //compile group: 'org.eclipse.swt', name: 'org.eclipse.swt.win32.win32.x86_64', version: '4.3'
-
-    // https://mvnrepository.com/artifact/org.eclipse.swt/org.eclipse.swt.win32.win32.x86
+    // https://mvnrepository.com/artifact/org.eclipse.swt/org.eclipse.swt.win32.win32.x86    (SWT-32bit)
     compile group: 'org.eclipse.swt', name: 'org.eclipse.swt.win32.win32.x86', version: '4.3'
 
     //compile files('org.eclipse.swt.win32.win32.x86_64_3.114.0.v20200304-0601.jar')
