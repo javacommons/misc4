@@ -93,7 +93,7 @@
 ### while importing or adding files and directories.
 ### '*' matches leading dots, e.g. '*.rej' matches '.foo.rej'.
 # global-ignores = *.o *.lo *.la *.al .libs *.so *.so.[0-9]* *.a *.pyc *.pyo __pycache__
-global-ignores = *.user *.user.* .qmake.stash  debug release  Makefile* tmp *_plugin_import.cpp build-* ui_*.h *.a *.dll *.exe *.tmp
+global-ignores = *.user *.user.* .qmake.stash  debug release  Makefile* tmp *_plugin_import.cpp build-* ui_*.h *.a *.dll *.exe *.tmp .classpath .gradle .project .settings bin build gradle gradlew gradlew.bat
 #   *.rej *~ #*# .#* .*.swp .DS_Store [Tt]humbs.db
 ### Set log-encoding to the default encoding for log messages
 # log-encoding = latin1
