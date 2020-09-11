@@ -7,8 +7,8 @@ buildscript {
     }
 }
 
-apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 mainClassName = "Main"
 group 'pl.smiesznadomena'
