@@ -1,7 +1,11 @@
 #include <QtCore>
+#include <QtGui>
+#include <QtWidgets>
 #include <archive.h>
 #include <archive_entry.h>
 #include <sys/utime.h>
+
+#include "dialog.h"
 
 bool extract_archive(const QString &archive_path, const QString &output_path) {
     QDir dir(output_path);
@@ -58,10 +62,22 @@ bool extract_archive(const QString &archive_path, const QString &output_path) {
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication app(argc, argv);
+    QApplication app(argc, argv);
     qDebug() << "hello!";
+    app.setOrganizationName("javacommons");
+    app.setApplicationName("cons001");
+    QSettings::setDefaultFormat(QSettings::IniFormat);
+    Dialog d(nullptr);
+    int i = d.exec();                  // 表示、結果を取得
+    if( i == QDialog::Accepted ) {
+        qDebug() << "QDialog::Accepted";
+    } else if( i == QDialog::Rejected ) {
+        qDebug() << "QDialog::Rejected";
+    }
+#if 0x0
     bool b = extract_archive(R"(C:\Users\Public\home\data\msys2-i686-20180320.7z)",
                              R"(C:\Users\Public\home\data\@out)");
     qDebug() << "b:" << b;
+#endif
     return 0;
 }

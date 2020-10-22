@@ -14,6 +14,7 @@
 .project
 .qmake.stash
 .settings
+.vscode
 __pycache__
 bin
 build
