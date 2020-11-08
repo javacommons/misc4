@@ -9,8 +9,12 @@
 #endif
 
 #include <windows.h>
-#include <assert.h>
+//#include <assert.h>
+#include <io.h>
 #include <tlhelp32.h>
+#include <algorithm>
+//#include <codecvt>
+#include <fstream>
 #include <iostream>
 #include <map>
 #include <string>
@@ -153,11 +157,18 @@ protected:
         return (ostrm == &std::cout) || (ostrm == &std::cerr);
     }
     bool is_console(std::istream* istrm) const {
-        return (istrm == &std::cin);
+        return (istrm == &std::cin && _isatty(_fileno(stdin)));
     }
     UINT out_codepage(std::ostream *ostrm) const {
         if(is_console(ostrm)) return m_console_codepage; else return CP_UTF8;
     }
+void skip_utf8_bom(std::istream& istrm) { // https://qiita.com/yumetodo/items/3744afa94ab029f4e1d5
+    int zero = istrm.tellg();
+    int dst[3];
+    for (auto& i : dst) i = istrm.get();
+    constexpr int utf8[] = { 0xEF, 0xBB, 0xBF };
+    if (!std::equal(std::begin(dst), std::end(dst), utf8)) istrm.seekg(zero);
+}
 public:
     void set_out_stream(std::ostream& ostrm) {
         m_ostrm = &ostrm;
@@ -346,6 +357,7 @@ public:
     }
     bool getlineW(std::wstring &line) {
         if (!is_console(m_istrm)) {
+            skip_utf8_bom(*m_istrm);
             std::string v_s;
             if (!std::getline(*m_istrm, v_s)) {
                 line = L"";
@@ -355,6 +367,7 @@ public:
             return true;
         }
         if(m_program == L"bash.exe") {
+            skip_utf8_bom(std::cin);
             std::string v_s;
             if(!std::getline(std::cin, v_s)) {
                 line = L"";
@@ -387,12 +400,16 @@ public:
         return b;
     }
     std::wstring getsW(const std::wstring &prompt = L"") {
-        if (!is_console(m_istrm)) return L"";
         ::Sleep(100);
         ::EnterCriticalSection(&m_csect);
         if(prompt != L"") {
             std::string v_out = wide_to_cp(prompt, m_console_codepage);
             std::cerr << v_out << std::flush;
+        }
+        if (!is_console(m_istrm)) {
+            std::cerr << "<not a console>" << std::endl << std::flush;
+            ::LeaveCriticalSection(&m_csect);
+            return L"";
         }
         std::wstring v_s;
         getlineW(v_s);
