@@ -1,5 +1,5 @@
 ﻿/* strconv2.hpp v0.0.0             */
-/* Last Modified: 2020/07/14 04:19 */
+/* Last Modified: 2020/11/09 07:31 */
 #ifndef STRCONV2_HPP
 #define STRCONV2_HPP
 
@@ -133,7 +133,7 @@ static inline std::string format(const char *format, ...) {
 }
 
 class string_io {
-public: /**/
+//public: /**/
     std::ostream* m_ostrm;
     std::istream* m_istrm;
     std::wstring m_program;
