@@ -330,12 +330,12 @@ public:
             return utf8_to_wide(v_s);
         }
         HANDLE std_in = ::GetStdHandle(STD_INPUT_HANDLE);
-        wchar_t buffer[1];
+        wchar_t v_buffer[1];
         DWORD n;
         std::wstring result;
-        while(::ReadConsole(std_in, buffer, 1, &n, NULL)) {
-            if (buffer[0] == 13) break;
-            result += buffer[0];
+        while(::ReadConsoleW(std_in, v_buffer, 1, &n, NULL)) {
+            if (v_buffer[0] == 13) break;
+            result += v_buffer[0];
         }
         return result;
     }
