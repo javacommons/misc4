@@ -132,16 +132,15 @@ static inline std::string format(const char *format, ...) {
 }
 
 class string_io {
+public: /**/
     std::ostream *m_ostrm;
+    std::wstring m_program;
     UINT m_console_codepage = 0;
-    //UINT m_program_codepage = 0;
     CRITICAL_SECTION m_csect;
 public:
-    explicit string_io(std::ostream &ostrm = std::cout, UINT ansi_codepage = ::GetACP()): m_ostrm(&ostrm) /*, m_program_codepage(ansi_codepage)*/ {
-        std::wstring program = parent_programW();
-        std::wstring term = getenvW(L"TERM");
-        bool use_utf8 = ((program == L"bash.exe" || program == L"zsh.exe") && term != L"cygwin");
-        m_console_codepage = use_utf8 ? CP_UTF8 : ::GetConsoleCP();
+    explicit string_io(std::ostream &ostrm = std::cout): m_ostrm(&ostrm) {
+        m_program = parent_programW();
+        m_console_codepage = ::GetConsoleCP();
         ::InitializeCriticalSection(&m_csect);
     }
     virtual ~string_io() {
@@ -158,11 +157,6 @@ public:
     void set_out_stream(std::ostream &ostrm) {
         m_ostrm = &ostrm;
     }
-#if 0x0
-    void set_ansi_codepage(UINT codepage) {
-        m_program_codepage = codepage;
-    }
-#endif
     std::wstring getenvW(const std::wstring &name) const {
         const wchar_t *p = ::_wgetenv(name.c_str());
         if(!p) return L"";
@@ -182,21 +176,21 @@ public:
         PROCESSENTRY32W pe32;
         pe32.dwSize = sizeof(pe32);
         DWORD parentPID = 0;
-        std::map<DWORD, std::wstring> ProcessIdVsNames;
+        std::map<DWORD, std::wstring> ProcessIdVsName;
         if(!::Process32FirstW(hProcessSnap, &pe32)) {
             ::CloseHandle(hProcessSnap);
             return L"";
         }
         do {
             std::pair<DWORD, std::wstring> p(pe32.th32ProcessID, pe32.szExeFile);
-            /*std::pair<std::map<DWORD, std::wstring>::iterator, bool> result = */ProcessIdVsNames.insert(p);
+            /*std::pair<std::map<DWORD, std::wstring>::iterator, bool> result = */ProcessIdVsName.insert(p);
             if(pe32.th32ProcessID == myPID) {
                 parentPID = pe32.th32ParentProcessID;
             }
         } while(::Process32NextW(hProcessSnap, &pe32));
         ::CloseHandle(hProcessSnap);
-        std::map<DWORD, std::wstring>::iterator parent = ProcessIdVsNames.find(parentPID);
-        if(parent == ProcessIdVsNames.end()) return L"";
+        std::map<DWORD, std::wstring>::iterator parent = ProcessIdVsName.find(parentPID);
+        if(parent == ProcessIdVsName.end()) return L"";
         return parent->second;
     }
     std::string parent_programJ() const
@@ -327,6 +321,24 @@ public:
     void writeln(std::ostream &ostrm, const std::string &s) {
         this->printf(ostrm, "%s\n", s.c_str());
     }
+    std::wstring getline() {
+        if(m_program == L"bash.exe") {
+            std::string v_s;
+            if(!std::getline(std::cin, v_s)) {
+                return L"";
+            }
+            return utf8_to_wide(v_s);
+        }
+        HANDLE std_in = ::GetStdHandle(STD_INPUT_HANDLE);
+        wchar_t buffer[1];
+        DWORD n;
+        std::wstring result;
+        while(::ReadConsole(std_in, buffer, 1, &n, NULL)) {
+            if (buffer[0] == 13) break;
+            result += buffer[0];
+        }
+        return result;
+    }
     std::wstring getsW(const std::wstring &prompt = L"") {
         ::Sleep(100);
         ::EnterCriticalSection(&m_csect);
@@ -334,14 +346,16 @@ public:
             std::string v_out = wide_to_cp(prompt, m_console_codepage);
             std::cerr << v_out << std::flush;
         }
+        std::wstring v_s = getline();
+#if 0x0
         std::string v_s;
         if (!std::getline(std::cin, v_s)) {
             ::LeaveCriticalSection(&m_csect);
             return L"";
         }
+#endif
         ::LeaveCriticalSection(&m_csect);
-        ::Sleep(100);
-        return cp_to_wide(v_s, m_console_codepage);
+        return v_s;
     }
     std::string getsJ(const std::string &prompt = "") {
         ::Sleep(100);
@@ -350,13 +364,16 @@ public:
             std::string v_out = cp_to_cp(prompt, 932, m_console_codepage);
             std::cerr << v_out << std::flush;
         }
+        std::wstring v_s = getline();
+#if 0x0
         std::string v_s;
         if (!std::getline(std::cin, v_s)) {
             ::LeaveCriticalSection(&m_csect);
             return "";
         }
+#endif
         ::LeaveCriticalSection(&m_csect);
-        return cp_to_cp(v_s, m_console_codepage, 932);
+        return wide_to_sjis(v_s);
     }
     std::string gets(const std::string &prompt = "") {
         ::Sleep(100);
@@ -365,13 +382,16 @@ public:
             std::string v_out = utf8_to_cp(prompt, m_console_codepage);
             std::cerr << v_out << std::flush;
         }
+        std::wstring v_s = getline();
+#if 0x0
         std::string v_s;
         if (!std::getline(std::cin, v_s)) {
             ::LeaveCriticalSection(&m_csect);
             return "";
         }
+#endif
         ::LeaveCriticalSection(&m_csect);
-        return cp_to_utf8(v_s, m_console_codepage);
+        return wide_to_utf8(v_s);
     }
     std::string to_consoleW(const std::wstring &s) const {
         return wide_to_cp(s, m_console_codepage);
