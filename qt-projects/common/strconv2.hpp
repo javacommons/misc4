@@ -321,7 +321,7 @@ public:
     void writeln(std::ostream &ostrm, const std::string &s) {
         this->printf(ostrm, "%s\n", s.c_str());
     }
-    std::wstring getline() {
+    std::wstring _getline() {
         if(m_program == L"bash.exe") {
             std::string v_s;
             if(!std::getline(std::cin, v_s)) {
@@ -346,14 +346,7 @@ public:
             std::string v_out = wide_to_cp(prompt, m_console_codepage);
             std::cerr << v_out << std::flush;
         }
-        std::wstring v_s = getline();
-#if 0x0
-        std::string v_s;
-        if (!std::getline(std::cin, v_s)) {
-            ::LeaveCriticalSection(&m_csect);
-            return L"";
-        }
-#endif
+        std::wstring v_s = _getline();
         ::LeaveCriticalSection(&m_csect);
         return v_s;
     }
@@ -364,14 +357,7 @@ public:
             std::string v_out = cp_to_cp(prompt, 932, m_console_codepage);
             std::cerr << v_out << std::flush;
         }
-        std::wstring v_s = getline();
-#if 0x0
-        std::string v_s;
-        if (!std::getline(std::cin, v_s)) {
-            ::LeaveCriticalSection(&m_csect);
-            return "";
-        }
-#endif
+        std::wstring v_s = _getline();
         ::LeaveCriticalSection(&m_csect);
         return wide_to_sjis(v_s);
     }
@@ -382,14 +368,7 @@ public:
             std::string v_out = utf8_to_cp(prompt, m_console_codepage);
             std::cerr << v_out << std::flush;
         }
-        std::wstring v_s = getline();
-#if 0x0
-        std::string v_s;
-        if (!std::getline(std::cin, v_s)) {
-            ::LeaveCriticalSection(&m_csect);
-            return "";
-        }
-#endif
+        std::wstring v_s = _getline();
         ::LeaveCriticalSection(&m_csect);
         return wide_to_utf8(v_s);
     }
