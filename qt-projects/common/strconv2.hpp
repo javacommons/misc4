@@ -1,4 +1,4 @@
-/* strconv2.hpp v0.0.0             */
+﻿/* strconv2.hpp v0.0.0             */
 /* Last Modified: 2020/07/14 04:19 */
 #ifndef STRCONV2_HPP
 #define STRCONV2_HPP
@@ -9,6 +9,7 @@
 #endif
 
 #include <windows.h>
+#include <assert.h>
 #include <tlhelp32.h>
 #include <iostream>
 #include <map>
@@ -133,12 +134,13 @@ static inline std::string format(const char *format, ...) {
 
 class string_io {
 public: /**/
-    std::ostream *m_ostrm;
+    std::ostream* m_ostrm;
+    std::istream* m_istrm;
     std::wstring m_program;
     UINT m_console_codepage = 0;
     CRITICAL_SECTION m_csect;
 public:
-    explicit string_io(std::ostream &ostrm = std::cout): m_ostrm(&ostrm) {
+    explicit string_io(std::ostream& ostrm = std::cout, std::istream& istrm = std::cin): m_ostrm(&ostrm), m_istrm(&istrm) {
         m_program = parent_programW();
         m_console_codepage = ::GetConsoleCP();
         ::InitializeCriticalSection(&m_csect);
@@ -147,15 +149,21 @@ public:
         ::DeleteCriticalSection(&m_csect);
     }
 protected:
-    bool is_console(std::ostream *ostrm) const {
+    bool is_console(std::ostream* ostrm) const {
         return (ostrm == &std::cout) || (ostrm == &std::cerr);
+    }
+    bool is_console(std::istream* istrm) const {
+        return (istrm == &std::cin);
     }
     UINT out_codepage(std::ostream *ostrm) const {
         if(is_console(ostrm)) return m_console_codepage; else return CP_UTF8;
     }
 public:
-    void set_out_stream(std::ostream &ostrm) {
+    void set_out_stream(std::ostream& ostrm) {
         m_ostrm = &ostrm;
+    }
+    void set_in_stream(std::istream& istrm) {
+        m_istrm = &istrm;
     }
     std::wstring getenvW(const std::wstring &name) const {
         const wchar_t *p = ::_wgetenv(name.c_str());
@@ -167,6 +175,21 @@ public:
     }
     std::string getenv(const std::string &name) const {
         return wide_to_utf8(getenvW(utf8_to_wide(name)));
+    }
+    bool setenvW(const std::wstring& name, const std::wstring& value, bool overwrite=true) {
+        const wchar_t* p = ::_wgetenv(name.c_str());
+        if (!p || overwrite) {
+            //return ::SetEnvironmentVariableW(name.c_str(), value.c_str());
+            std::wstring str = formatW(L"%s=%s", name.c_str(), value.c_str());
+            return (_wputenv(str.c_str()) == 0);
+        }
+        return true;
+    }
+    bool setenvJ(const std::string& name, const std::string& value, bool overwrite = true) {
+        return setenvW(sjis_to_wide(name), sjis_to_wide(value), overwrite);
+    }
+    bool setenv(const std::string& name, const std::string& value, bool overwrite = true) {
+        return setenvW(utf8_to_wide(name), utf8_to_wide(value), overwrite);
     }
     std::wstring parent_programW() const
     {
@@ -321,13 +344,24 @@ public:
     void writeln(std::ostream &ostrm, const std::string &s) {
         this->printf(ostrm, "%s\n", s.c_str());
     }
-    std::wstring _getline() {
+    bool getlineW(std::wstring &line) {
+        if (!is_console(m_istrm)) {
+            std::string v_s;
+            if (!std::getline(*m_istrm, v_s)) {
+                line = L"";
+                return false;
+            }
+            line = utf8_to_wide(v_s);
+            return true;
+        }
         if(m_program == L"bash.exe") {
             std::string v_s;
             if(!std::getline(std::cin, v_s)) {
-                return L"";
+                line = L"";
+                return false;
             }
-            return utf8_to_wide(v_s);
+            line = utf8_to_wide(v_s);
+            return true;
         }
         HANDLE std_in = ::GetStdHandle(STD_INPUT_HANDLE);
         wchar_t v_buffer[1];
@@ -337,39 +371,40 @@ public:
             if (v_buffer[0] == 13) break;
             result += v_buffer[0];
         }
-        return result;
+        line = result;
+        return true;
+    }
+    bool getlineJ(std::string &line) {
+        std::wstring result;
+        bool b = getlineW(result);
+        line = wide_to_sjis(result);
+        return b;
+    }
+    bool getline(std::string &line) {
+        std::wstring result;
+        bool b = getlineW(result);
+        line = wide_to_utf8(result);
+        return b;
     }
     std::wstring getsW(const std::wstring &prompt = L"") {
+        if (!is_console(m_istrm)) return L"";
         ::Sleep(100);
         ::EnterCriticalSection(&m_csect);
         if(prompt != L"") {
             std::string v_out = wide_to_cp(prompt, m_console_codepage);
             std::cerr << v_out << std::flush;
         }
-        std::wstring v_s = _getline();
+        std::wstring v_s;
+        getlineW(v_s);
         ::LeaveCriticalSection(&m_csect);
         return v_s;
     }
     std::string getsJ(const std::string &prompt = "") {
-        ::Sleep(100);
-        ::EnterCriticalSection(&m_csect);
-        if(prompt != "") {
-            std::string v_out = cp_to_cp(prompt, 932, m_console_codepage);
-            std::cerr << v_out << std::flush;
-        }
-        std::wstring v_s = _getline();
-        ::LeaveCriticalSection(&m_csect);
+        std::wstring v_s = getsW(sjis_to_wide(prompt));
         return wide_to_sjis(v_s);
     }
     std::string gets(const std::string &prompt = "") {
-        ::Sleep(100);
-        ::EnterCriticalSection(&m_csect);
-        if(prompt != "") {
-            std::string v_out = utf8_to_cp(prompt, m_console_codepage);
-            std::cerr << v_out << std::flush;
-        }
-        std::wstring v_s = _getline();
-        ::LeaveCriticalSection(&m_csect);
+        std::wstring v_s = getsW(sjis_to_wide(prompt));
         return wide_to_utf8(v_s);
     }
     std::string to_consoleW(const std::wstring &s) const {
