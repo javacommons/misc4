@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-namespace strconv {
+namespace strconv2 {
 
 #if __cplusplus >= 201103L
 static inline std::wstring cp_to_wide(const std::string &s, UINT codepage) {
@@ -112,7 +112,7 @@ static inline std::wstring formatW(const wchar_t *format, ...) {
     va_end(args);
     return &v_buffer[0];
 }
-static inline std::string formatA(const char *format, ...) {
+static inline std::string formatJ(const char *format, ...) {
     ::va_list args;
     va_start(args, format);
     int v_len = ::_vsnprintf(nullptr, 0, format, args);
@@ -131,20 +131,20 @@ static inline std::string format(const char *format, ...) {
     return &v_buffer[0];
 }
 
-class io {
+class string_io {
     std::ostream *m_ostrm;
     UINT m_console_codepage = 0;
-    UINT m_program_codepage = 0;
+    //UINT m_program_codepage = 0;
     CRITICAL_SECTION m_csect;
 public:
-    explicit io(std::ostream &ostrm = std::cout, UINT ansi_codepage = ::GetACP()): m_ostrm(&ostrm), m_program_codepage(ansi_codepage) {
+    explicit string_io(std::ostream &ostrm = std::cout, UINT ansi_codepage = ::GetACP()): m_ostrm(&ostrm) /*, m_program_codepage(ansi_codepage)*/ {
         std::wstring program = parent_programW();
         std::wstring term = getenvW(L"TERM");
         bool use_utf8 = ((program == L"bash.exe" || program == L"zsh.exe") && term != L"cygwin");
         m_console_codepage = use_utf8 ? CP_UTF8 : ::GetConsoleCP();
         ::InitializeCriticalSection(&m_csect);
     }
-    virtual ~io() {
+    virtual ~string_io() {
         ::DeleteCriticalSection(&m_csect);
     }
 protected:
@@ -158,16 +158,18 @@ public:
     void set_out_stream(std::ostream &ostrm) {
         m_ostrm = &ostrm;
     }
+#if 0x0
     void set_ansi_codepage(UINT codepage) {
         m_program_codepage = codepage;
     }
+#endif
     std::wstring getenvW(const std::wstring &name) const {
         const wchar_t *p = ::_wgetenv(name.c_str());
         if(!p) return L"";
         return p;
     }
-    std::string getenvA(const std::string &name) const {
-        return wide_to_cp(getenvW(cp_to_wide(name, m_program_codepage)), m_program_codepage);
+    std::string getenvJ(const std::string &name) const {
+        return wide_to_sjis(getenvW(sjis_to_wide(name)));
     }
     std::string getenv(const std::string &name) const {
         return wide_to_utf8(getenvW(utf8_to_wide(name)));
@@ -197,9 +199,9 @@ public:
         if(parent == ProcessIdVsNames.end()) return L"";
         return parent->second;
     }
-    std::string parent_programA() const
+    std::string parent_programJ() const
     {
-        return wide_to_cp(parent_programW(), m_program_codepage);
+        return wide_to_cp(parent_programW(), 932);
     }
     std::string parent_program()
     {
@@ -219,7 +221,7 @@ public:
         (*m_ostrm) << v_out << std::flush;
         ::LeaveCriticalSection(&m_csect);
     }
-    void printfA(const char *format, ...)
+    void printfJ(const char *format, ...)
     {
         ::va_list args;
         va_start(args, format);
@@ -228,7 +230,7 @@ public:
         ::_vsnprintf(&v_buffer[0], v_len + 1, format, args);
         va_end(args);
         std::string v_str = &v_buffer[0];
-        std::string v_out = cp_to_cp(v_str, m_program_codepage, out_codepage(m_ostrm));
+        std::string v_out = cp_to_cp(v_str, 932, out_codepage(m_ostrm));
         ::EnterCriticalSection(&m_csect);
         (*m_ostrm) << v_out << std::flush;
         ::LeaveCriticalSection(&m_csect);
@@ -261,7 +263,7 @@ public:
         ostrm << v_out << std::flush;
         ::LeaveCriticalSection(&m_csect);
     }
-    void printfA(std::ostream &ostrm, const char *format, ...)
+    void printfJ(std::ostream &ostrm, const char *format, ...)
     {
         ::va_list args;
         va_start(args, format);
@@ -270,7 +272,7 @@ public:
         _vsnprintf(&v_buffer[0], v_len + 1, format, args);
         va_end(args);
         std::string v_str = &v_buffer[0];
-        std::string v_out = cp_to_cp(v_str, m_program_codepage, out_codepage(&ostrm));
+        std::string v_out = cp_to_cp(v_str, 932, out_codepage(&ostrm));
         ::EnterCriticalSection(&m_csect);
         ostrm << v_out << std::flush;
         ::LeaveCriticalSection(&m_csect);
@@ -292,8 +294,8 @@ public:
     void writeW(const std::wstring &s) {
         this->printfW(L"%s", s.c_str());
     }
-    void writeA(const std::string &s) {
-        this->printfA("%s", s.c_str());
+    void writeJ(const std::string &s) {
+        this->printfJ("%s", s.c_str());
     }
     void write(const std::string &s) {
         this->printf("%s", s.c_str());
@@ -301,8 +303,8 @@ public:
     void writeW(std::ostream &ostrm, const std::wstring &s) {
         this->printfW(ostrm, L"%s", s.c_str());
     }
-    void writeA(std::ostream &ostrm, const std::string &s) {
-        this->printfA(ostrm, "%s", s.c_str());
+    void writeJ(std::ostream &ostrm, const std::string &s) {
+        this->printfJ(ostrm, "%s", s.c_str());
     }
     void write(std::ostream &ostrm, const std::string &s) {
         this->printf(ostrm, "%s", s.c_str());
@@ -310,8 +312,8 @@ public:
     void writelnW(const std::wstring &s) {
         this->printfW(L"%s\n", s.c_str());
     }
-    void writelnA(const std::string &s) {
-        this->printfA("%s\n", s.c_str());
+    void writelnJ(const std::string &s) {
+        this->printfJ("%s\n", s.c_str());
     }
     void writeln(const std::string &s) {
         this->printf("%s\n", s.c_str());
@@ -319,11 +321,11 @@ public:
     void writelnW(std::ostream &ostrm, const std::wstring &s) {
         this->printfW(ostrm, L"%s\n", s.c_str());
     }
+    void writelnJ(std::ostream& ostrm, const std::string& s) {
+        this->printfJ(ostrm, "%s\n", s.c_str());
+    }
     void writeln(std::ostream &ostrm, const std::string &s) {
         this->printf(ostrm, "%s\n", s.c_str());
-    }
-    void writelnA(std::ostream &ostrm, const std::string &s) {
-        this->printfA(ostrm, "%s\n", s.c_str());
     }
     std::wstring getsW(const std::wstring &prompt = L"") {
         ::Sleep(100);
@@ -341,11 +343,11 @@ public:
         ::Sleep(100);
         return cp_to_wide(v_s, m_console_codepage);
     }
-    std::string getsA(const std::string &prompt = "") {
+    std::string getsJ(const std::string &prompt = "") {
         ::Sleep(100);
         ::EnterCriticalSection(&m_csect);
         if(prompt != "") {
-            std::string v_out = cp_to_cp(prompt, m_program_codepage, m_console_codepage);
+            std::string v_out = cp_to_cp(prompt, 932, m_console_codepage);
             std::cerr << v_out << std::flush;
         }
         std::string v_s;
@@ -354,7 +356,7 @@ public:
             return "";
         }
         ::LeaveCriticalSection(&m_csect);
-        return cp_to_cp(v_s, m_console_codepage, m_program_codepage);
+        return cp_to_cp(v_s, m_console_codepage, 932);
     }
     std::string gets(const std::string &prompt = "") {
         ::Sleep(100);
@@ -374,8 +376,8 @@ public:
     std::string to_consoleW(const std::wstring &s) const {
         return wide_to_cp(s, m_console_codepage);
     }
-    std::string to_consoleA(const std::string &s) const {
-        return cp_to_cp(s, m_program_codepage, m_console_codepage);
+    std::string to_consoleJ(const std::string &s) const {
+        return cp_to_cp(s, 932, m_console_codepage);
     }
     std::string to_console(const std::string &s) const {
         return utf8_to_cp(s, m_console_codepage);
