@@ -12,7 +12,6 @@
 #include <assert.h>
 #include <io.h>
 #include <tlhelp32.h>
-#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -136,7 +135,7 @@ static inline std::string format(const char *format, ...) {
 }
 
 class string_io {
-//public: /**/
+    //public: /**/
     std::ostream* m_ostrm;
     std::istream* m_istrm;
     std::wstring m_parent_program;
@@ -157,13 +156,12 @@ protected:
     }
     bool is_console(std::istream* istrm) const {
         return (istrm == &std::cin && (m_parent_program == L"bash.exe" || _isatty(_fileno(stdin))));
-        //return istrm == &std::cin;
     }
     UINT out_codepage(std::ostream *ostrm) const {
         if(is_console(ostrm)) return m_console_codepage; else return CP_UTF8;
     }
 public:
-    void dump() {
+    void _dump() { // for internal debug
         std::cerr << "string_io { m_parent_program=" << wide_to_ansi(m_parent_program) << ", m_console_codepage=" << m_console_codepage << " }" << std::endl << std::flush;
     }
     void set_out_stream(std::ostream& ostrm) {
@@ -351,18 +349,9 @@ public:
         this->printf(ostrm, "%s\n", s.c_str());
     }
     bool getlineW(std::wstring &line) {
-        if (!is_console(m_istrm)) {
+        if (!is_console(m_istrm) || m_parent_program == L"bash.exe") {
             std::string v_s;
             if (!std::getline(*m_istrm, v_s)) {
-                line = L"";
-                return false;
-            }
-            line = utf8_to_wide(v_s);
-            return true;
-        }
-        if(m_parent_program == L"bash.exe") {
-            std::string v_s;
-            if(!std::getline(std::cin, v_s)) {
                 line = L"";
                 return false;
             }
