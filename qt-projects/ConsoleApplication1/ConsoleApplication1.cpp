@@ -24,6 +24,7 @@ std::wstring ProcessIdToNameW(DWORD processId)
         if (QueryFullProcessImageNameW(handle, 0, &buffer[0], &buffer_size))
         {
             ret = &buffer[0];
+            ret = ret.substr(ret.find_last_of('\\') + 1);
         }
         else
         {
@@ -38,27 +39,20 @@ std::wstring ProcessIdToNameW(DWORD processId)
     return ret;
 }
 
+std::wstring GetConsoleProgramW() {
+    HWND hwnd = GetConsoleWindow();
+    if (!hwnd) return L"";
+    DWORD proc_id;
+    DWORD th_id = GetWindowThreadProcessId(hwnd, &proc_id);
+    return ProcessIdToNameW(proc_id);
+}
+
 int main()
 {
     string_io io;
     io._dump();
 
-    HWND hwnd = GetConsoleWindow();
-    io.printf(u8"hwnd=%p\n", hwnd);
-    if (hwnd) {
-        std::wstring text(4096, L'\0');
-        int r = GetWindowTextW(
-            hwnd,
-            &text[0],
-            text.length()
-        );
-        DWORD err = GetLastError();
-        io.printfW(L"r=%d err=%u text=%s\n", r, err, text.c_str());
-        DWORD proc_id;
-        DWORD th_id = GetWindowThreadProcessId(hwnd, &proc_id);
-        io.printf("proc_id=%u\n", proc_id);
-        io.printfW(L"ProcessIdToNameW(proc_id)=%s\n", ProcessIdToNameW(proc_id).c_str());
-    }
+    io.printfW(L"GetConsoleProgramW()=%s\n", GetConsoleProgramW().c_str());
 
     cout << "Hello World!(3)" << endl;
     wstring wide = L"abc漢字©";
