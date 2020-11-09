@@ -15,6 +15,7 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -148,15 +149,16 @@ class string_io {
     std::istream* m_istrm;
     std::wstring m_parent_program;
     UINT m_console_codepage = 0;
-    CRITICAL_SECTION m_csect;
+    //CRITICAL_SECTION m_csect;
+    std::mutex m_mutex;
 public:
     explicit string_io(std::ostream& ostrm = std::cout, std::istream& istrm = std::cin): m_ostrm(&ostrm), m_istrm(&istrm) {
         m_parent_program = parent_programW();
         m_console_codepage = ::GetConsoleCP();
-        ::InitializeCriticalSection(&m_csect);
+        //::InitializeCriticalSection(&m_csect);
     }
     virtual ~string_io() {
-        ::DeleteCriticalSection(&m_csect);
+        //::DeleteCriticalSection(&m_csect);
     }
 protected:
     bool is_console(std::ostream* ostrm) const {
@@ -246,9 +248,10 @@ public:
         va_end(args);
         std::wstring v_str = &v_buffer[0];
         std::string v_out = wide_to_cp(v_str, out_codepage(m_ostrm));
-        ::EnterCriticalSection(&m_csect);
+        std::lock_guard<std::mutex> lock(m_mutex);
+        //::EnterCriticalSection(&m_csect);
         (*m_ostrm) << v_out << std::flush;
-        ::LeaveCriticalSection(&m_csect);
+        //::LeaveCriticalSection(&m_csect);
     }
     void printfJ(const char *format, ...)
     {
@@ -260,9 +263,10 @@ public:
         va_end(args);
         std::string v_str = &v_buffer[0];
         std::string v_out = cp_to_cp(v_str, 932, out_codepage(m_ostrm));
-        ::EnterCriticalSection(&m_csect);
+        std::lock_guard<std::mutex> lock(m_mutex);
+        //::EnterCriticalSection(&m_csect);
         (*m_ostrm) << v_out << std::flush;
-        ::LeaveCriticalSection(&m_csect);
+        //::LeaveCriticalSection(&m_csect);
     }
     void printf(const char *format, ...)
     {
@@ -274,9 +278,10 @@ public:
         va_end(args);
         std::string v_str = &v_buffer[0];
         std::string v_out = utf8_to_cp(v_str, out_codepage(m_ostrm));
-        ::EnterCriticalSection(&m_csect);
+        std::lock_guard<std::mutex> lock(m_mutex);
+        //::EnterCriticalSection(&m_csect);
         (*m_ostrm) << v_out << std::flush;
-        ::LeaveCriticalSection(&m_csect);
+        //::LeaveCriticalSection(&m_csect);
     }
     void printfW(std::ostream &ostrm, const wchar_t *format, ...)
     {
@@ -288,9 +293,10 @@ public:
         va_end(args);
         std::wstring v_str = &v_buffer[0];
         std::string v_out = wide_to_cp(v_str, out_codepage(&ostrm));
-        ::EnterCriticalSection(&m_csect);
+        std::lock_guard<std::mutex> lock(m_mutex);
+        //::EnterCriticalSection(&m_csect);
         ostrm << v_out << std::flush;
-        ::LeaveCriticalSection(&m_csect);
+        //::LeaveCriticalSection(&m_csect);
     }
     void printfJ(std::ostream &ostrm, const char *format, ...)
     {
@@ -302,9 +308,10 @@ public:
         va_end(args);
         std::string v_str = &v_buffer[0];
         std::string v_out = cp_to_cp(v_str, 932, out_codepage(&ostrm));
-        ::EnterCriticalSection(&m_csect);
+        std::lock_guard<std::mutex> lock(m_mutex);
+        //::EnterCriticalSection(&m_csect);
         ostrm << v_out << std::flush;
-        ::LeaveCriticalSection(&m_csect);
+        //::LeaveCriticalSection(&m_csect);
     }
     void printf(std::ostream &ostrm, const char *format, ...)
     {
@@ -316,9 +323,10 @@ public:
         va_end(args);
         std::string v_str = &v_buffer[0];
         std::string v_out = utf8_to_cp(v_str, out_codepage(&ostrm));
-        ::EnterCriticalSection(&m_csect);
+        std::lock_guard<std::mutex> lock(m_mutex);
+        //::EnterCriticalSection(&m_csect);
         ostrm << v_out << std::flush;
-        ::LeaveCriticalSection(&m_csect);
+        //::LeaveCriticalSection(&m_csect);
     }
     void writeW(const std::wstring &s) {
         this->printfW(L"%s", s.c_str());
@@ -393,14 +401,15 @@ public:
     }
     std::wstring promptW(const std::wstring &prompt = L"") {
         ::Sleep(100);
-        ::EnterCriticalSection(&m_csect);
+        std::lock_guard<std::mutex> lock(m_mutex);
+        //::EnterCriticalSection(&m_csect);
         if(prompt != L"") {
             std::string v_out = wide_to_cp(prompt, m_console_codepage);
             std::cerr << v_out << std::flush;
         }
         std::wstring v_s;
         getlineW(v_s);
-        ::LeaveCriticalSection(&m_csect);
+        //::LeaveCriticalSection(&m_csect);
         return v_s;
     }
     std::string promptJ(const std::string &prompt = "") {
