@@ -9,31 +9,31 @@ using namespace std;
 using namespace strconv2;
 //using strconv2::utf8_to_sjis;
 
-std::string ProcessIdToName(DWORD processId)
+std::wstring ProcessIdToNameW(DWORD processId)
 {
-    std::string ret;
+    std::wstring ret;
     HANDLE handle = OpenProcess(
         PROCESS_QUERY_LIMITED_INFORMATION,
         FALSE,
-        processId /* This is the PID, you can find one from windows task manager */
+        processId
     );
     if (handle)
     {
-        DWORD buffSize = 1024;
-        CHAR buffer[1024];
-        if (QueryFullProcessImageNameA(handle, 0, buffer, &buffSize))
+        std::vector<wchar_t> buffer(10240);
+        DWORD buffer_size = buffer.size();
+        if (QueryFullProcessImageNameW(handle, 0, &buffer[0], &buffer_size))
         {
-            ret = buffer;
+            ret = &buffer[0];
         }
         else
         {
-            printf("Error GetModuleBaseNameA : %lu", GetLastError());
+            ret = L"";
         }
         CloseHandle(handle);
     }
     else
     {
-        printf("Error OpenProcess : %lu", GetLastError());
+        ret = L"";
     }
     return ret;
 }
@@ -57,7 +57,7 @@ int main()
         DWORD proc_id;
         DWORD th_id = GetWindowThreadProcessId(hwnd, &proc_id);
         io.printf("proc_id=%u\n", proc_id);
-        io.printf("ProcessIdToName(proc_id)=%s\n", ProcessIdToName(proc_id).c_str());
+        io.printfW(L"ProcessIdToNameW(proc_id)=%s\n", ProcessIdToNameW(proc_id).c_str());
     }
 
     cout << "Hello World!(3)" << endl;
