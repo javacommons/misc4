@@ -10,16 +10,16 @@ using namespace strconv2;
 int main()
 {
     string_io io;
-    cout << io.m_console_codepage << endl;
+    io.dump();
     cout << "Hello World!(3)" << endl;
     std::string utf8 = "abc漢字©";
     cout << utf8 << endl;
     cout << utf8_to_sjis(utf8) << endl;
     wstring wide = L"abc漢字©";
     io.printfW(L"%s\n", wide.c_str());
-    wstring w2 = io.getsW(L"wide入力: ");
+    wstring w2 = io.promptW(L"wide入力: ");
     io.writelnW(w2);
-    string sjis = io.getsJ("abc入力: ");
+    string sjis = io.promptJ("sjis input: ");
     io.writelnJ(sjis);
 
     cout << io.setenv(u8"AAA", u8"xyz変数©") << endl;

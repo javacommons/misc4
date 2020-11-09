@@ -9,11 +9,10 @@
 #endif
 
 #include <windows.h>
-//#include <assert.h>
+#include <assert.h>
 #include <io.h>
 #include <tlhelp32.h>
 #include <algorithm>
-//#include <codecvt>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -140,12 +139,12 @@ class string_io {
 //public: /**/
     std::ostream* m_ostrm;
     std::istream* m_istrm;
-    std::wstring m_program;
+    std::wstring m_parent_program;
     UINT m_console_codepage = 0;
     CRITICAL_SECTION m_csect;
 public:
     explicit string_io(std::ostream& ostrm = std::cout, std::istream& istrm = std::cin): m_ostrm(&ostrm), m_istrm(&istrm) {
-        m_program = parent_programW();
+        m_parent_program = parent_programW();
         m_console_codepage = ::GetConsoleCP();
         ::InitializeCriticalSection(&m_csect);
     }
@@ -157,19 +156,25 @@ protected:
         return (ostrm == &std::cout) || (ostrm == &std::cerr);
     }
     bool is_console(std::istream* istrm) const {
-        return (istrm == &std::cin && _isatty(_fileno(stdin)));
+        //return (istrm == &std::cin && (m_parent_program == L"bash.exe" || _isatty(_fileno(stdin))));
+        return istrm == &std::cin;
     }
     UINT out_codepage(std::ostream *ostrm) const {
         if(is_console(ostrm)) return m_console_codepage; else return CP_UTF8;
     }
-void skip_utf8_bom(std::istream& istrm) { // https://qiita.com/yumetodo/items/3744afa94ab029f4e1d5
-    int zero = istrm.tellg();
-    int dst[3];
-    for (auto& i : dst) i = istrm.get();
-    constexpr int utf8[] = { 0xEF, 0xBB, 0xBF };
-    if (!std::equal(std::begin(dst), std::end(dst), utf8)) istrm.seekg(zero);
-}
+#if 0x0
+    void skip_utf8_bom(std::istream& istrm) { // Source: https://qiita.com/yumetodo/items/3744afa94ab029f4e1d5
+        auto zero = istrm.tellg();
+        int dst[3];
+        for (auto& i : dst) i = istrm.get();
+        constexpr int utf8[] = { 0xEF, 0xBB, 0xBF };
+        if (!std::equal(std::begin(dst), std::end(dst), utf8)) istrm.seekg(zero);
+    }
+#endif
 public:
+    void dump() {
+        std::cerr << "string_io { " << wide_to_ansi(m_parent_program) << ", " << m_console_codepage << " }" << std::endl << std::flush;
+    }
     void set_out_stream(std::ostream& ostrm) {
         m_ostrm = &ostrm;
     }
@@ -357,7 +362,7 @@ public:
     }
     bool getlineW(std::wstring &line) {
         if (!is_console(m_istrm)) {
-            skip_utf8_bom(*m_istrm);
+            //skip_utf8_bom(*m_istrm);
             std::string v_s;
             if (!std::getline(*m_istrm, v_s)) {
                 line = L"";
@@ -366,8 +371,9 @@ public:
             line = utf8_to_wide(v_s);
             return true;
         }
-        if(m_program == L"bash.exe") {
-            skip_utf8_bom(std::cin);
+#if 0x1
+        if(m_parent_program == L"bash.exe") {
+            //skip_utf8_bom(std::cin);
             std::string v_s;
             if(!std::getline(std::cin, v_s)) {
                 line = L"";
@@ -376,6 +382,8 @@ public:
             line = utf8_to_wide(v_s);
             return true;
         }
+        assert(m_parent_program != L"bash.exe");
+#endif
         HANDLE std_in = ::GetStdHandle(STD_INPUT_HANDLE);
         wchar_t v_buffer[1];
         DWORD n;
@@ -399,7 +407,7 @@ public:
         line = wide_to_utf8(result);
         return b;
     }
-    std::wstring getsW(const std::wstring &prompt = L"") {
+    std::wstring promptW(const std::wstring &prompt = L"") {
         ::Sleep(100);
         ::EnterCriticalSection(&m_csect);
         if(prompt != L"") {
@@ -416,12 +424,12 @@ public:
         ::LeaveCriticalSection(&m_csect);
         return v_s;
     }
-    std::string getsJ(const std::string &prompt = "") {
-        std::wstring v_s = getsW(sjis_to_wide(prompt));
+    std::string promptJ(const std::string &prompt = "") {
+        std::wstring v_s = promptW(sjis_to_wide(prompt));
         return wide_to_sjis(v_s);
     }
-    std::string gets(const std::string &prompt = "") {
-        std::wstring v_s = getsW(sjis_to_wide(prompt));
+    std::string prompt(const std::string &prompt = "") {
+        std::wstring v_s = promptW(utf8_to_wide(prompt));
         return wide_to_utf8(v_s);
     }
     std::string to_consoleW(const std::wstring &s) const {
