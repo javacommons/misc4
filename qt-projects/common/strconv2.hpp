@@ -54,21 +54,29 @@ static inline std::string wide_to_cp(const std::wstring &s, UINT codepage) {
 }
 #endif
 
-static inline std::string cp_to_utf8(const std::string &s, UINT codepage) {
-    if (codepage == CP_UTF8) return s;
-    std::wstring wide = cp_to_wide(s, codepage);
-    return wide_to_cp(wide, CP_UTF8);
-}
-static inline std::string utf8_to_cp(const std::string &s, UINT codepage) {
-    if (codepage == CP_UTF8) return s;
-    std::wstring wide = cp_to_wide(s, CP_UTF8);
-    return wide_to_cp(wide, codepage);
-}
-
 static inline std::string cp_to_cp(const std::string &s, UINT from, UINT to) {
     if (from == to) return s;
     std::wstring wide = cp_to_wide(s, from);
     return wide_to_cp(wide, to);
+}
+
+static inline std::string cp_to_utf8(const std::string &s, UINT codepage) {
+    if (codepage == CP_UTF8) return s;
+#if 0x0
+    std::wstring wide = cp_to_wide(s, codepage);
+    return wide_to_cp(wide, CP_UTF8);
+#else
+    return cp_to_cp(s, codepage, CP_UTF8);
+#endif
+}
+static inline std::string utf8_to_cp(const std::string &s, UINT codepage) {
+    if (codepage == CP_UTF8) return s;
+#if 0x0
+    std::wstring wide = cp_to_wide(s, CP_UTF8);
+    return wide_to_cp(wide, codepage);
+#else
+    return cp_to_cp(s, CP_UTF8, codepage);
+#endif
 }
 
 static inline std::wstring ansi_to_wide(const std::string &s) {
