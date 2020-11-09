@@ -156,8 +156,8 @@ protected:
         return (ostrm == &std::cout) || (ostrm == &std::cerr);
     }
     bool is_console(std::istream* istrm) const {
-        //return (istrm == &std::cin && (m_parent_program == L"bash.exe" || _isatty(_fileno(stdin))));
-        return istrm == &std::cin;
+        return (istrm == &std::cin && (m_parent_program == L"bash.exe" || _isatty(_fileno(stdin))));
+        //return istrm == &std::cin;
     }
     UINT out_codepage(std::ostream *ostrm) const {
         if(is_console(ostrm)) return m_console_codepage; else return CP_UTF8;
@@ -186,7 +186,6 @@ public:
     bool setenvW(const std::wstring& name, const std::wstring& value, bool overwrite=true) {
         const wchar_t* p = ::_wgetenv(name.c_str());
         if (!p || overwrite) {
-            //return ::SetEnvironmentVariableW(name.c_str(), value.c_str());
             std::wstring str = formatW(L"%s=%s", name.c_str(), value.c_str());
             return (_wputenv(str.c_str()) == 0);
         }
