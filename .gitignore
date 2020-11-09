@@ -2,6 +2,7 @@
 *.dll
 *.egg-info
 *.exe
+*.filters
 *.spec
 *.swp
 *.tmp
@@ -14,6 +15,7 @@
 .project
 .qmake.stash
 .settings
+.vs
 .vscode
 __pycache__
 bin
