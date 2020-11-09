@@ -10,7 +10,7 @@ using namespace strconv2;
 int main()
 {
     string_io io;
-    io.dump();
+    io._dump();
     cout << "Hello World!(3)" << endl;
     std::string utf8 = "abc漢字©";
     cout << utf8 << endl;

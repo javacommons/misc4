@@ -372,7 +372,8 @@ public:
         DWORD n;
         std::wstring result;
         while(::ReadConsoleW(std_in, v_buffer, 1, &n, NULL)) {
-            if (v_buffer[0] == 13) break;
+            if (v_buffer[0] == 13) continue;
+            if (v_buffer[0] == 10) break;
             result += v_buffer[0];
         }
         line = result;
