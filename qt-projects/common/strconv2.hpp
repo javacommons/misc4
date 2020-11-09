@@ -162,18 +162,9 @@ protected:
     UINT out_codepage(std::ostream *ostrm) const {
         if(is_console(ostrm)) return m_console_codepage; else return CP_UTF8;
     }
-#if 0x0
-    void skip_utf8_bom(std::istream& istrm) { // Source: https://qiita.com/yumetodo/items/3744afa94ab029f4e1d5
-        auto zero = istrm.tellg();
-        int dst[3];
-        for (auto& i : dst) i = istrm.get();
-        constexpr int utf8[] = { 0xEF, 0xBB, 0xBF };
-        if (!std::equal(std::begin(dst), std::end(dst), utf8)) istrm.seekg(zero);
-    }
-#endif
 public:
     void dump() {
-        std::cerr << "string_io { " << wide_to_ansi(m_parent_program) << ", " << m_console_codepage << " }" << std::endl << std::flush;
+        std::cerr << "string_io { m_parent_program=" << wide_to_ansi(m_parent_program) << ", m_console_codepage=" << m_console_codepage << " }" << std::endl << std::flush;
     }
     void set_out_stream(std::ostream& ostrm) {
         m_ostrm = &ostrm;
@@ -362,7 +353,6 @@ public:
     }
     bool getlineW(std::wstring &line) {
         if (!is_console(m_istrm)) {
-            //skip_utf8_bom(*m_istrm);
             std::string v_s;
             if (!std::getline(*m_istrm, v_s)) {
                 line = L"";
@@ -371,9 +361,7 @@ public:
             line = utf8_to_wide(v_s);
             return true;
         }
-#if 0x1
         if(m_parent_program == L"bash.exe") {
-            //skip_utf8_bom(std::cin);
             std::string v_s;
             if(!std::getline(std::cin, v_s)) {
                 line = L"";
@@ -383,7 +371,6 @@ public:
             return true;
         }
         assert(m_parent_program != L"bash.exe");
-#endif
         HANDLE std_in = ::GetStdHandle(STD_INPUT_HANDLE);
         wchar_t v_buffer[1];
         DWORD n;
@@ -413,11 +400,6 @@ public:
         if(prompt != L"") {
             std::string v_out = wide_to_cp(prompt, m_console_codepage);
             std::cerr << v_out << std::flush;
-        }
-        if (!is_console(m_istrm)) {
-            std::cerr << "<not a console>" << std::endl << std::flush;
-            ::LeaveCriticalSection(&m_csect);
-            return L"";
         }
         std::wstring v_s;
         getlineW(v_s);
