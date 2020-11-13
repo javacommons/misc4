@@ -107,6 +107,10 @@ int main()
     std::cout << enc1.size() << std::endl;
     std::string dec1 = base64_decode(enc1);
     std::cout << dec1.size() << std::endl;
+
+    json json1 = json::from_msgpack(dec1);
+    std::cout << json1.dump(4) << std::endl;
+
     msgpack::object_handle oh1 =
         msgpack::unpack(dec1.data(), dec1.size());
     msgpack::object obj1 = oh1.get();
