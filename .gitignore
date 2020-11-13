@@ -1,4 +1,5 @@
 *.a
+*.bak
 *.dll
 *.egg-info
 *.exe
@@ -22,6 +23,7 @@ bin
 build
 build-*
 debug
+desktop.ini
 dist
 gradle
 gradlew
