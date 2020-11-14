@@ -19,7 +19,7 @@ solution "Hello Premake"
     links {
       "calc", "opengl32", "glu32"
     }
-    linkoptions { "-static" }
+    linkoptions { "-static -Wl,-allow-multiple-definition" }
     configuration "Debug"
       defines { "DEBUG" }
       flags { "Symbols" }
