@@ -36,7 +36,8 @@ const char *hello(const char *name)
   return msg.c_str();
 }
 
-typedef std::map<std::string, msgpack::object> MapStrMsgpackObj;
+typedef std::map<std::string, msgpack::object> ARGS_AS_MAP;
+typedef std::vector<msgpack::object>           ARGS_AS_VECTOR;
 
 template <typename T>
 std::string pack_api_result(T x)
@@ -56,7 +57,7 @@ struct api1_result_type
 };
 std::string api1(const msgpack::object &args)
 {
-  MapStrMsgpackObj mmap = args.as<MapStrMsgpackObj>();
+  ARGS_AS_MAP mmap = args.as<ARGS_AS_MAP>();
   double a = mmap.find("a")->second.as<double>();
   double b = mmap.find("b")->second.as<double>();
   std::cout << a << std::endl;
@@ -67,12 +68,18 @@ std::string api1(const msgpack::object &args)
   return pack_api_result(result);
 }
 
+std::string sum(const msgpack::object &args)
+{
+  ARGS_AS_VECTOR mvect = args.as<ARGS_AS_VECTOR>();
+  std::cout << mvect.size() << std::endl;
+  return  pack_api_result(0);
+}
+
 const char *apicall(const char *name, const char *base64_args)
 {
   std::string api_name = name;
-  static TLS_VARIABLE_DECL std::string result;
+  std::string result;
   //std::cout << "(1)" << std::endl;
-  result = "";
   //std::cout << "(2)" << std::endl;
   std::string packed = base64_decode(std::string(base64_args));
   msgpack::object_handle oh =
@@ -87,9 +94,9 @@ const char *apicall(const char *name, const char *base64_args)
   }
   else if (api_name == "sum")
   {
-    std::cout << "[sum]" << std::endl;
-    result = pack_api_result(0);
+    result = sum(args);
   }
-  std::string base64_result = base64_encode(result);
+  static TLS_VARIABLE_DECL std::string base64_result = base64_encode(result);
+  std::cout << "base64_result=" << base64_result << std::endl;
   return base64_result.c_str();
 }
