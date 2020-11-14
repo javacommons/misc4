@@ -6,6 +6,8 @@
 (require msgpack)
 (require net/base64)
 
+(require "call-api.rkt")
+
 (define-ffi-definer define-calc (ffi-lib "calc"))
 
 (define-calc add (_fun _int _int -> _int))
@@ -13,7 +15,7 @@
 (define-calc ref1 (_fun (ret : (_ptr o _int)) -> _void -> ret))
 (define-calc ret_str (_fun -> _string))
 (define-calc hello (_fun _string -> _string))
-(define-calc apicall (_fun _string/latin-1 _string/latin-1 -> _string/latin-1))
+;(define-calc apicall (_fun _string/latin-1 _string/latin-1 -> _string/latin-1))
 
 (add 11 33)
 (add 11 22)
@@ -42,27 +44,6 @@ b2
 ;(define input (read))
 ;(set! input '777)
 ;(print input)
-
-(define (call-api name args)
-  (printf "api-name=~s args=~s\n" name args)
-  (let* ([packed-args #f] [base64-args #f] [base64-result #f] [packed-result #f] [result #f])
-    (set! packed-args (pack args))
-    ;(printf "(A)packed-args=~s\n" packed-args)
-    (set! base64-args (base64-encode packed-args #""))
-    ;(printf "(B)base64-args=~s\n" (bytes->string/latin-1 base64-args))
-    (set! base64-result (apicall name (bytes->string/latin-1 base64-args)))
-    ;(printf "(C)base64-result=~s\n" base64-result)
-    (set! packed-result (base64-decode (string->bytes/latin-1 base64-result)))
-    ;(printf "(D)packed-result=~s\n" packed-result)
-    (set! result (unpack packed-result))
-    ;(printf "(E)result=~s\n" result)
-    result
-    )
-  )
-
-(define (call-api* name . args)
-  (call-api name args)
-  )
 
 (define api-input (hash "a" 11.11 "b" 22.22))
 api-input
