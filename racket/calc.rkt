@@ -6,9 +6,6 @@
 (require msgpack)
 (require net/base64)
 
-;(define (dbg msg) (println msg))
-(define (dbg msg) #f)
-
 (define-ffi-definer define-calc (ffi-lib "calc"))
 
 (define-calc add (_fun _int _int -> _int))
@@ -16,6 +13,7 @@
 (define-calc ref1 (_fun (ret : (_ptr o _int)) -> _void -> ret))
 (define-calc ret_str (_fun -> _string))
 (define-calc hello (_fun _string -> _string))
+(define-calc apicall (_fun _string _string -> _string))
 
 (add 11 33)
 (add 11 22)
@@ -44,3 +42,25 @@ b2
 ;(define input (read))
 ;(set! input '777)
 ;(print input)
+
+(define (call-api name args)
+  (printf "args=~s\n" args)
+  (let* ([packed-args (pack args)]
+	 [base64-args (base64-encode packed-args #"")]
+	 [base64-result (apicall name base64-args)]
+	 [packed-result (base64-decode (string->bytes/latin-1 base64-result))]
+	 [result (unpack packed-result)]
+	 )
+;    (printf "packed-args=~s\n" packed-args)
+;    (printf "base64-args=~s\n" base64-args)
+;    (printf "base64-result=~s\n" base64-result)
+;    (printf "packed-result=~s\n" packed-result)
+;    (printf "result=~s\n" result)
+    result
+    )
+  )
+
+(define api-input (hash "a" 11.11 "b" 22.22))
+api-input
+
+(call-api "api1" api-input)

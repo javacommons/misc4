@@ -21,14 +21,14 @@
                                   (println (send event get-event-type))
                                   (send msg set-label "Listbox click"))]
                       ))
- 
+
 (define msg (new message% [parent frame]
                  [label "No events so far..."]))
- 
+
 (define btn (new button% [parent frame]
                  [label "Click Me"]
                  [callback (lambda (button event)
                              (println (send event get-event-type))
                              (send msg set-label "Button click"))]))
- 
+
 (send frame show #t)
