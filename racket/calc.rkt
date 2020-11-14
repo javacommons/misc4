@@ -41,6 +41,6 @@ p2
 b2
 (unpack (base64-decode b2))
 
-(define input (read))
-(set! input '777)
+;(define input (read))
+;(set! input '777)
 ;(print input)
