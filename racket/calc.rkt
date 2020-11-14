@@ -44,7 +44,7 @@ b2
 ;(print input)
 
 (define (call-api name args)
-  (printf "args=~s\n" args)
+  (printf "api-name=~s args=~s\n" name args)
   (let* ([packed-args (pack args)]
 	 [base64-args (base64-encode packed-args #"")]
 	 [base64-result (apicall name base64-args)]
@@ -60,7 +60,16 @@ b2
     )
   )
 
+(define p3 (pack '[11 77 33]))
+(printf "p3=~s\n" p3)
+(define b3 (base64-encode p3 #""))
+(printf "b3=~s\n" b3)
+(define r3 (apicall "sum" b3))
+
 (define api-input (hash "a" 11.11 "b" 22.22))
 api-input
 
 (call-api "api1" api-input)
+(println "bofore sum")
+(call-api "sum" '[11 99 33])
+(println "after sum")
