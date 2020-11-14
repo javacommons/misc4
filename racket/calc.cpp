@@ -71,8 +71,7 @@ std::string api1(const msgpack::object &args)
 std::string sum(const msgpack::object &args)
 {
   ARGS_AS_VECTOR mvect = args.as<ARGS_AS_VECTOR>();
-  std::cout << mvect.size() << std::endl;
-
+  //std::cout << mvect.size() << std::endl;
   double result = 0.0;
   for (decltype(mvect)::iterator it = mvect.begin();
        it != mvect.end();
@@ -80,7 +79,7 @@ std::string sum(const msgpack::object &args)
   {
     //std::cout << *it << std::endl;
     double d = it->as<double>();
-    std::cout << d << std::endl;
+    //std::cout << d << std::endl;
     result += d;
   }
   return pack_api_result(result);
@@ -109,6 +108,6 @@ const char *apicall(const char *name, const char *base64_args)
   }
   static TLS_VARIABLE_DECL std::string base64_result;
   base64_result = base64_encode(result);
-  std::cout << "base64_result=" << base64_result << std::endl;
+  //std::cout << "base64_result=" << base64_result << std::endl;
   return base64_result.c_str();
 }
