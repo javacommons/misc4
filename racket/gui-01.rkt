@@ -20,21 +20,21 @@
                                    'column-headers))
                       (columns (list "First Column"))
                       [callback (lambda (button event)
-                         (println (send event get-event-type))
-                         (send msg set-label "Listbox click"))]
+                                  (println (send event get-event-type))
+                                  (send msg set-label "Listbox click"))]
                       ))
  
 ; Make a static text message in the frame
 (define msg (new message% [parent frame]
-                          [label "No events so far..."]))
+                 [label "No events so far..."]))
  
 ; Make a button in the frame
-(new button% [parent frame]
-             [label "Click Me"]
-             ; Callback procedure for a button click:
-             [callback (lambda (button event)
-                         (println (send event get-event-type))
-                         (send msg set-label "Button click"))])
+(define btn (new button% [parent frame]
+                 [label "Click Me"]
+                 ; Callback procedure for a button click:
+                 [callback (lambda (button event)
+                             (println (send event get-event-type))
+                             (send msg set-label "Button click"))]))
  
 ; Show the frame by calling its show method
 (send frame show #t)
