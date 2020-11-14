@@ -3,8 +3,8 @@
 (require ffi/unsafe
          ffi/unsafe/define)
 (require json)
-(require msgpack)
-(require net/base64)
+;(require msgpack)
+;(require net/base64)
 
 (require "call-api.rkt")
 
@@ -29,18 +29,6 @@
 (hasheq 'a 123 'b 456)
 (jsexpr->string (hasheq 'a 123 'b 456))
 
-(define p1 (pack "Hello world!"))
-p1
-(unpack p1)
-
-(define p2 (pack (hash "a" 123.45 "b" 456.78 "c" '[1 2 3])))
-p2
-(unpack p2)
-
-(define b2 (base64-encode p2 #""))
-b2
-(unpack (base64-decode b2))
-
 ;(define input (read))
 ;(set! input '777)
 ;(print input)
@@ -53,3 +41,4 @@ api-input
 (call-api "sum" '[11 99 33])
 (println "after sum")
 (call-api* "sum" 1 2 33)
+(call-api* "none" 1 "abc" 33)

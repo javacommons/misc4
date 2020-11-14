@@ -30,11 +30,18 @@ const char *ret_str()
 
 const char *hello(const char *name)
 {
-  static TLS_VARIABLE_DECL std::string msg = "こんにちは ";
+  static TLS_VARIABLE_DECL std::string msg;
+  msg = "こんにちは ";
   msg += name;
   return msg.c_str();
 }
 
+struct api1_input_type
+{
+  double a;
+  double b;
+  MSGPACK_DEFINE(a, b);
+};
 struct api1_result_type
 {
   double sum;
@@ -43,9 +50,17 @@ struct api1_result_type
 };
 std::string api1(const msgpack::object &args)
 {
+#if 0x1
   ARGS_AS_MAP mmap = args.as<ARGS_AS_MAP>();
   double a = mmap.find("a")->second.as<double>();
   double b = mmap.find("b")->second.as<double>();
+#else
+  api1_input_type input;
+  //args.convert(input);
+  input = args.as<api1_input_type>();
+  double a = input.a;
+  double b = input.b;
+#endif
   std::cout << a << std::endl;
   std::cout << b << std::endl;
   api1_result_type result;
