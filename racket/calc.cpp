@@ -2,7 +2,6 @@
 #include "vardecl.h"
 #include <string>
 
-#include <msgpack.hpp>
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -36,19 +35,6 @@ const char *hello(const char *name)
   return msg.c_str();
 }
 
-typedef std::map<std::string, msgpack::object> ARGS_AS_MAP;
-typedef std::vector<msgpack::object> ARGS_AS_VECTOR;
-
-template <typename T>
-std::string pack_api_result(T x)
-{
-  std::stringstream buffer;
-  msgpack::pack(buffer, x);
-  buffer.seekg(0);
-  std::string str(buffer.str());
-  return str;
-}
-
 struct api1_result_type
 {
   double sum;
@@ -71,15 +57,12 @@ std::string api1(const msgpack::object &args)
 std::string sum(const msgpack::object &args)
 {
   ARGS_AS_VECTOR mvect = args.as<ARGS_AS_VECTOR>();
-  //std::cout << mvect.size() << std::endl;
   double result = 0.0;
   for (decltype(mvect)::iterator it = mvect.begin();
        it != mvect.end();
        ++it)
   {
-    //std::cout << *it << std::endl;
     double d = it->as<double>();
-    //std::cout << d << std::endl;
     result += d;
   }
   return pack_api_result(result);
@@ -89,14 +72,10 @@ const char *apicall(const char *name, const char *base64_args)
 {
   std::string api_name = name;
   std::string result = pack_api_result(0);
-  //std::cout << "(1)" << std::endl;
-  //std::cout << "(2)" << std::endl;
   std::string packed = base64_decode(std::string(base64_args));
   msgpack::object_handle oh =
       msgpack::unpack(packed.data(), packed.size());
-  //std::cout << "(3)" << std::endl;
   msgpack::object args = oh.get();
-  //std::cout << "(4)" << std::endl;
   std::cout << "API=" << api_name << " args=" << args << std::endl;
   if (api_name == "api1")
   {
@@ -108,6 +87,5 @@ const char *apicall(const char *name, const char *base64_args)
   }
   static TLS_VARIABLE_DECL std::string base64_result;
   base64_result = base64_encode(result);
-  //std::cout << "base64_result=" << base64_result << std::endl;
   return base64_result.c_str();
 }
