@@ -4,6 +4,7 @@
 *.egg-info
 *.exe
 *.filters
+*.make
 *.spec
 *.swp
 *.tmp

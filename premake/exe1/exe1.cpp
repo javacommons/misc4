@@ -4,5 +4,5 @@
 #include "calc.exp.hpp"
 
 int main() {
-    printf("hello=%d\n", add(11, 22));
+    printf("hello result=%d\n", add(11, 22));
 }
