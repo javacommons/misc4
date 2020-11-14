@@ -3,8 +3,11 @@
 #ifndef fltk2_h
 #define fltk2_h
 #include <FL/Fl.H>
+#include <FL/fl_ask.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Table.H>
+extern Fl_Table *m_table_01;
 void cb_button_01(Fl_Widget *, void *vp);
 
 class MyUI {
@@ -22,5 +25,4 @@ public:
   void show(int argc, char **argv);
   static void cb_button(Fl_Widget *, void *vp);
 };
-#include <FL/fl_ask.H>
 #endif

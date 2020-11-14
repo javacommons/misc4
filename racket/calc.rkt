@@ -18,7 +18,7 @@
 (println (sub 11 22))
 (println (ref1))
 (println (ret_str))
-(println (hello "bobボブ"))
+(println (hello "bobボブ©"))
 (println (jsexpr->string '[11 22 33]))
 (println (hello (jsexpr->string '[11 "あいう" 33])))
 (println (string->jsexpr "{\"a\": 123}"))
@@ -36,3 +36,4 @@
 (define b2 (base64-encode p2 #""))
 (println b2)
 (println (unpack (base64-decode b2)))
+;(read)

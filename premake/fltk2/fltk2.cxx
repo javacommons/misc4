@@ -4,6 +4,8 @@
 
 static Fl_Button *m_button_01=(Fl_Button *)0;
 
+Fl_Table *m_table_01=(Fl_Table *)0;
+
 int main(int argc, char **argv) {
   Fl_Double_Window* w;
   printf("Hello, World!\n");
@@ -14,6 +16,9 @@ int main(int argc, char **argv) {
       m_button_01->callback((Fl_Callback*)cb_button_01, (void*)("b#01"));
       m_button_01->label(fl_cancel);
     } // Fl_Button* m_button_01
+    { m_table_01 = new Fl_Table(25, 25, 340, 75);
+      m_table_01->end();
+    } // Fl_Table* m_table_01
     o->end();
   } // Fl_Double_Window* o
   w->show(argc, argv);

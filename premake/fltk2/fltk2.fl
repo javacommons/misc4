@@ -2,13 +2,15 @@
 version 1.0305
 header_name {.h}
 code_name {.cxx}
+decl {\#include <FL/fl_ask.H>} {public global
+}
+
 Function {} {open
 } {
   code {printf("Hello, World!\\n");
-fl_cancel = "エフエルキャンセル";} {selected
-  }
+fl_cancel = "エフエルキャンセル";} {}
   Fl_Window {} {open
-    xywh {762 479 365 100} type Double visible
+    xywh {762 479 365 292} type Double hide
   } {
     Fl_Button m_button_01 {
       label m_button_01
@@ -17,6 +19,9 @@ fl_cancel = "エフエルキャンセル";} {selected
       private xywh {10 10 110 30}
       code0 {m_button_01->label(fl_cancel);}
     }
+    Fl_Table m_table_01 {open selected
+      xywh {10 50 340 225}
+    } {}
   }
 }
 
@@ -32,7 +37,7 @@ class MyUI {open
   } {
     code {printf("Hello, World!\\n");} {}
     Fl_Window {} {open
-      xywh {138 161 120 100} type Double visible
+      xywh {138 161 120 100} type Double hide
     } {
       Fl_Button m_button_02 {
         label m_button_02
@@ -47,7 +52,7 @@ class UI {open
   Function {UI()} {open
   } {
     Fl_Window m_win {open
-      xywh {476 284 800 600} type Single visible
+      xywh {476 284 800 600} type Single hide
     } {
       Fl_Button m_button {
         callback cb_button
@@ -63,7 +68,4 @@ class UI {open
   } {
     code {printf("Hello, World!\\n");} {}
   }
-}
-
-decl {\#include <FL/fl_ask.H>} {public global
 }

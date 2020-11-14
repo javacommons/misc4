@@ -1,6 +1,7 @@
 /* #include "calc.h" */
 
 #include <string>
+#include "vardecl.h"
 
 extern "C" {
 
@@ -23,7 +24,7 @@ const char* ret_str() {
 }
 
 const char *hello(const char *name) {
-  std::string msg = "こんにちは ";
+  static TLS_VARIABLE_DECL std::string msg = "こんにちは ";
   msg += name;
   return msg.c_str();
 }
