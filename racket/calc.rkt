@@ -8,6 +8,9 @@
 
 (require "call-api.rkt")
 
+(printf "Given arguments: ~s\n"
+        (current-command-line-arguments))
+
 (define-ffi-definer define-calc (ffi-lib "calc"))
 
 (define-calc add (_fun _int _int -> _int))
@@ -42,4 +45,6 @@ api-input
 (println "after sum")
 (call-api* "sum" 1 2 33)
 (call-api* "none" 1 "abc" 33)
-(call-api "sum" "dummy")
+					;(call-api "sum" "dummy")
+
+(find-system-path 'run-file)
