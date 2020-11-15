@@ -8,6 +8,9 @@
 #include <iostream>
 #include "base64.hpp"
 
+#include <time.h>
+#include <assert.h>
+
 int add(int x, int y)
 {
   return x + y;
@@ -38,10 +41,6 @@ const char *hello(const char *name)
 
 api1_output api1(const api1_input &input)
 {
-  //double a = input.a;
-  //double b = input.b;
-  //std::cout << a << std::endl;
-  //std::cout << b << std::endl;
   api1_output output;
   output.sum = input.a + input.b;
   output.diff = input.a - input.b;
@@ -69,13 +68,13 @@ double sum(const std::vector<double> &args)
 const char *apicall(const char *name, const char *base64_args)
 {
   std::string api_name = name;
-  std::string packed_result = pack_result(false);
+  MsgPack dummy = false;
+  std::string packed_result = dummy.dump();
   std::string packed = base64_decode(std::string(base64_args));
   std::string err;
   MsgPack obj = MsgPack::parse(packed, err);
   if (err != "")
     printf("err=[%s]\n", err.c_str());
-  //std::cout << "API=" << api_name << " args=" << args << std::endl;
   if (api_name == "api1")
   {
     api1_input input(obj);
