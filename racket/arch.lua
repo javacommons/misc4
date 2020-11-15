@@ -5,7 +5,8 @@ solution "Hello Premake"
 
   project "arch"
     -- https://github.com/premake/premake-core/wiki/kind
-    kind "SharedLib"
+    -- kind "SharedLib"
+    kind "ConsoleApp"
     language "C++"
     files {
       "liba.cpp",

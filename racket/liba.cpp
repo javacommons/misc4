@@ -7,6 +7,8 @@
 
 #include <filesystem>
 
+#include <iostream>
+
 inline bool ends_with(std::string const & value, std::string const & ending)
 {
     if (ending.size() > value.size()) return false;
@@ -26,9 +28,10 @@ bool extract_archive(const std::wstring &archive_path, const std::wstring &outpu
     struct archive *a = archive_read_new();
     archive_read_support_format_all(a);
     if ((r = archive_read_open_filename_w(a, archive_path.c_str(), 10240))) {
-        //qDebug() << "Could not open:" << archive_path;
+        std::cout << "Could not open:" << wide_to_utf8(archive_path) << std::endl;
         return false;
     }
+    std::cout << "Open:" << wide_to_utf8(archive_path) << std::endl;
     for (;;) {
         struct archive_entry *entry;
         r = archive_read_next_header(a, &entry);
@@ -48,7 +51,7 @@ bool extract_archive(const std::wstring &archive_path, const std::wstring &outpu
         std::wstring expFilePath = output_path + L"/" + entry_pathname;
         //qDebug() << "expFilePath:" << expFilePath;
         if(ends_with(entry_pathname, L"/")) {
-            std::filesystem::create_directory(expFilePath);
+            std::filesystem::create_directories(expFilePath);
             //QDir dir;
             //dir.mkpath(expFilePath);
             continue;
@@ -60,7 +63,7 @@ bool extract_archive(const std::wstring &archive_path, const std::wstring &outpu
         std::filesystem::path dir = file.parent_path();
         //qDebug() << dir.absolutePath();
         //dir.mkpath(dir.absolutePath());
-        std::filesystem::create_directory(dir);
+        std::filesystem::create_directories(dir);
         FILE *fp;;
         if(fp = _wfopen(expFilePath.c_str(), L"wb")) {
             int fd = fileno(fp);
@@ -79,10 +82,12 @@ bool extract_archive(const std::wstring &archive_path, const std::wstring &outpu
 
 int main(int argc, char *argv[])
 {
+    std::cout << "main(1)" << std::endl;
 #if 0x1
-    bool b = extract_archive(LR"(C:\Users\Public\home\data\msys2-i686-20180320.7z)",
-                             LR"(C:\Users\Public\home\data\@out)");
+    bool b = extract_archive(LR"(C:\root\Dropbox\_data_\msys2-base-x86_64-20200903.tar)",
+                             LR"(C:\Users\javac\Documents\misc4\racket\@out.tmp)");
     //qDebug() << "b:" << b;
+    std::cout << "main(2)" << b << std::endl;
 #endif
     return 0;
 }
