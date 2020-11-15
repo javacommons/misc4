@@ -26,6 +26,7 @@ bool extract_archive(const std::wstring &archive_path, const std::wstring &outpu
     //dir.removeRecursively();
     int r;
     struct archive *a = archive_read_new();
+    archive_read_support_compression_all(a);
     archive_read_support_format_all(a);
     if ((r = archive_read_open_filename_w(a, archive_path.c_str(), 10240))) {
         std::cout << "Could not open:" << wide_to_utf8(archive_path) << std::endl;
@@ -84,7 +85,7 @@ int main(int argc, char *argv[])
 {
     std::cout << "main(1)" << std::endl;
 #if 0x1
-    bool b = extract_archive(LR"(C:\root\Dropbox\_data_\msys2-base-x86_64-20200903.tar)",
+    bool b = extract_archive(LR"(C:\root\Dropbox\_data_\msys2-base-x86_64-20200903.tar.xz)",
                              LR"(C:\Users\javac\Documents\misc4\racket\@out.tmp)");
     //qDebug() << "b:" << b;
     std::cout << "main(2)" << b << std::endl;

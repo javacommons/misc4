@@ -22,7 +22,7 @@ solution "Hello Premake"
       -- ".."
     }
     links {
-      "archive", "z", "bz2", "lzma", "iconv", "bcrypt", "expat"
+      "archive", "z", "bz2", "lzma", "iconv", "bcrypt", "expat", "lz4", "zstd"
     }
     linkoptions { "-static", "-Wl,-allow-multiple-definition" }
     configuration "Debug"
