@@ -17,21 +17,21 @@ using json = nlohmann::json;
 
 #include "pipe.hpp"
 
-static HANDLE hPipe = INVALID_HANDLE_VALUE;
+//static HANDLE hPipe = INVALID_HANDLE_VALUE;
 static const char *client_program = NULL;
 
-int open_pipe_server(const char *name,
-                     const char *client)
+unsigned long long open_pipe_server(const char *name,
+                                    const char *client)
 {
   client_program = client;
   std::cout << "(1)" << std::endl;
-  hPipe = create_pipe_server(name, 4096);
+  HANDLE hPipe = create_pipe_server(name, 4096);
   std::cout << "(2)" << std::endl;
   if (hPipe == INVALID_HANDLE_VALUE)
   {
     std::cout << "(3)" << std::endl;
     MessageBoxW(NULL, L"サーバーパイプの作成に失敗しました。", NULL, MB_ICONWARNING);
-    return false;
+    return (unsigned long long)INVALID_HANDLE_VALUE;
   }
   std::string cmdline = client_program;
   cmdline += " ";
@@ -53,19 +53,25 @@ int open_pipe_server(const char *name,
   std::cout << "(4)" << std::endl;
   ConnectNamedPipe(hPipe, NULL);
   std::cout << "(5)" << std::endl;
-  return true;
+  return (unsigned long long)hPipe;
 }
 
-const char *read_from_pipe()
+const char *read_from_pipe(unsigned long long hPipe)
 {
   static TLS_VARIABLE_DECL std::string read;
-  read = read_string_from_pipe(hPipe);
+  read = read_string_from_pipe((HANDLE)hPipe);
   return read.c_str();
 }
 
-void write_to_pipe(const char *s)
+void write_to_pipe(unsigned long long hPipe, const char *s)
 {
-  write_string_to_pipe(hPipe, s);
+  write_string_to_pipe((HANDLE)hPipe, s);
+}
+
+unsigned long long ret_addr()
+{
+  char *p = (char *)malloc(128);
+  return (unsigned long long)p;
 }
 
 int add(int x, int y)

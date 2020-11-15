@@ -7,9 +7,13 @@
 (require net/base64)
 
 (define-ffi-definer define-calc (ffi-lib "calc"))
-(define-calc open_pipe_server (_fun _string _string -> _int))
-(define-calc read_from_pipe(_fun -> _string))
-(define-calc write_to_pipe(_fun _string -> _void))
+(define-calc open_pipe_server (_fun _string _string -> _ullong))
+(define-calc read_from_pipe(_fun _ullong -> _string))
+(define-calc write_to_pipe(_fun _ullong _string -> _void))
+(define-calc ret_addr(_fun -> _ullong))
+
+;unsigned long long ret_addr()
+
 
 (define (encode-input $name $value)
   (let* ([$input (hash "name" $name "value" $value)]
@@ -30,11 +34,13 @@
 	 [$name (~t $now "'pipe'-yyyy-MM-dd'T'HH:mm:ss.SSSSSSSS")])
     (open_pipe_server $name $client)))
 
-(define (::call-thru-pipe $name $value)
-  (write_to_pipe (encode-input $name $value))
-  (decode-output (string->bytes/latin-1 (read_from_pipe))))
+(define (::call-thru-pipe $hPipe $name $value)
+  (write_to_pipe $hPipe (encode-input $name $value))
+  (decode-output (string->bytes/latin-1 (read_from_pipe $hPipe))))
 
-(::open-pipe-server "client.exe")
-(::call-thru-pipe "name1" '(11 22 "33"))
+(define $hPipe (::open-pipe-server "client.exe"))
+(::call-thru-pipe $hPipe "name1" '(11 22 "33"))
+
+(ret_addr)
 
 (provide ::open-pipe-server ::call-thru-pipe)

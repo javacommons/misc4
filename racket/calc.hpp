@@ -1,12 +1,16 @@
+#include <windows.h>
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-  int open_pipe_server(const char *name,
-                       const char *client);
-  const char *read_from_pipe();
-  void write_to_pipe(const char *s);
+  unsigned long long open_pipe_server(const char *name,
+                                      const char *client);
+  const char *read_from_pipe(unsigned long long hPipe);
+  void write_to_pipe(unsigned long long hPipe, const char *s);
+  unsigned long long ret_addr();
+
   int add(int x, int y);
   int sub(int x, int y);
   void ref1(int *ret);
