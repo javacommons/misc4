@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 
     char   szData[] = "sample-data";
 
-    HANDLE hPipe = create_pipe_crient("SamplePipe");
+    HANDLE hPipe = create_pipe_crient("2020-11-16T05:13:01.444776611");
     if (hPipe == INVALID_HANDLE_VALUE) {
         MessageBoxW(NULL, L"パイプへの接続に失敗しました。",
                     NULL, MB_ICONWARNING);
