@@ -55,6 +55,9 @@ api1_output api1(const api1_input &input)
   strftime(str, sizeof(str), "%Y-%m-%d %H:%I:%S", &tm);
   printf("%s\n", str);
   output.ts = str;
+  output.bin.push_back(0);
+  output.bin.push_back(1);
+  output.bin.push_back(2);
   return output;
 }
 

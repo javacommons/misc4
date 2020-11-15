@@ -40,12 +40,14 @@ struct api1_output
   double sum;
   double diff;
   std::string ts;
+  std::vector<uint8_t> bin;
   std::string pack()
   {
     MsgPack obj = MsgPack::object{
         {"sum", this->sum},
         {"diff", this->diff},
-        {"ts", this->ts}};
+        {"ts", this->ts},
+        {"bin", this->bin},};
     return obj.dump();
   }
 };
