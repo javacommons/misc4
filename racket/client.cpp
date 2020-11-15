@@ -9,6 +9,8 @@
 using json = nlohmann::json;
 
 #include "base64.hpp"
+#include "msgpack11.hpp"
+using namespace msgpack11;
 
 int main(int argc, char *argv[])
 {
@@ -24,13 +26,26 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    write_string_to_pipe(hPipe, szData);
+    //write_string_to_pipe(hPipe, szData);
     std::string read = read_string_from_pipe(hPipe);
     std::string packed = base64_decode(read);
     json json1 = json::from_msgpack(packed);
     //std::cout << "[API]" << api_name << " args=" << json1.dump() << std::endl;
 
     MessageBoxW(NULL, utf8_to_wide(json1.dump(4)).c_str(), L"クライアント", MB_OK);
+
+    std::string ts;
+    std::vector<uint8_t> bin;
+
+    MsgPack obj = MsgPack::object{
+        {"sum", 12.34},
+        {"diff", 45.67},
+        {"ts", ts},
+        {"bin", bin},
+    };
+    std::string output = obj.dump();
+    std::string base64_result = base64_encode(output);
+    write_string_to_pipe(hPipe, base64_result);
 
     CloseHandle(hPipe);
 
