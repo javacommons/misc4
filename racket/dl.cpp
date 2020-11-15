@@ -1,30 +1,19 @@
 #include <windows.h>
-#include <Wininet.h>
-
+#include <wininet.h>
 #include <assert.h>
 #include <string>
 #include <sstream>
-#include <locale.h>
-#include <conio.h>
-//#include "NhConversion.h"
 
-#pragma comment(lib, "Wininet.lib")
-
-#define _T(X) X
-
-//typedef std::basic_string<TCHAR>		tstring;
-//typedef std::basic_stringstream<TCHAR>	tstringstream;
-typedef std::string tstring;
-typedef std::stringstream tstringstream;
+#pragma comment(lib, "wininet.lib")
 
 #define URLBUFFER_SIZE (4096)
 #define READBUFFER_SIZE (4096)
 
-bool HttpRequest(tstring strUserAgent,
-                 tstring strUrl,
+bool HttpRequest(std::string strUserAgent,
+                 std::string strUrl,
                  bool bIsHttpVerbGet,
-                 tstring strParameter,
-                 tstring &rstrResult)
+                 std::string strParameter,
+                 std::string &rstrResult)
 {
     // アウトプットの初期化
     rstrResult = "";
@@ -35,12 +24,12 @@ bool HttpRequest(tstring strUserAgent,
     HINTERNET hInternetRequest = NULL;
     //const char*			pszOptional = NULL;
     URL_COMPONENTS urlcomponents;
-    tstring strServer;
-    tstring strObject;
+    std::string strServer;
+    std::string strObject;
     INTERNET_PORT nPort;
-    tstring strVerb;
-    tstring strHeaders;
-    tstringstream ssRead;
+    std::string strVerb;
+    std::string strHeaders;
+    std::stringstream ssRead;
 
     // URL解析
     ZeroMemory(&urlcomponents, sizeof(URL_COMPONENTS));
@@ -51,10 +40,10 @@ bool HttpRequest(tstring strUserAgent,
     urlcomponents.lpszUrlPath = szUrlPath;
     urlcomponents.dwHostNameLength = URLBUFFER_SIZE;
     urlcomponents.dwUrlPathLength = URLBUFFER_SIZE;
-    if (!InternetCrackUrl(strUrl.c_str(),
-                          (DWORD)strUrl.length(),
-                          0,
-                          &urlcomponents))
+    if (!InternetCrackUrlA(strUrl.c_str(),
+                           (DWORD)strUrl.length(),
+                           0,
+                           &urlcomponents))
     { // URLの解析に失敗
         assert(!"URL解析に失敗");
         return false;
@@ -89,23 +78,23 @@ bool HttpRequest(tstring strUserAgent,
     // GETかPOSTか
     if (bIsHttpVerbGet)
     { // GET
-        strVerb = _T("GET");
-        strHeaders = _T("");
+        strVerb = "GET";
+        strHeaders = "";
         if (0 != strParameter.length())
         { // オブジェクトとパラメータを「?」で連結
-            strObject += _T("?") + strParameter;
+            strObject += "?" + strParameter;
         }
     }
     else
     { // POST
-        strVerb = _T("POST");
-        strHeaders = _T("Content-Type: application/x-www-form-urlencoded");
+        strVerb = "POST";
+        strHeaders = "Content-Type: application/x-www-form-urlencoded";
     }
 
     // WinInetの初期化
-    hInternetOpen = InternetOpen(strUserAgent.c_str(),
-                                 INTERNET_OPEN_TYPE_PRECONFIG,
-                                 NULL, NULL, 0);
+    hInternetOpen = InternetOpenA(strUserAgent.c_str(),
+                                  INTERNET_OPEN_TYPE_PRECONFIG,
+                                  NULL, NULL, 0);
     if (NULL == hInternetOpen)
     {
         assert(!"WinInetの初期化に失敗");
@@ -144,10 +133,10 @@ bool HttpRequest(tstring strUserAgent,
 
     // HTTP要求送信
     if (!HttpSendRequestA(hInternetRequest,
-                         strHeaders.c_str(),
-                         (DWORD)strHeaders.length(),
-                         (LPVOID)(strParameter.length()==0 ? 0 : (char *)strParameter.c_str()),
-                         strParameter.length()))
+                          strHeaders.c_str(),
+                          (DWORD)strHeaders.length(),
+                          (LPVOID)(strParameter.length() == 0 ? 0 : (char *)strParameter.c_str()),
+                          strParameter.length()))
     {
         assert(!"HTTP要求送信に失敗");
         goto LABEL_ERROR;
@@ -189,20 +178,17 @@ bool HttpRequest(tstring strUserAgent,
             break;
         }
         std::string packet(szReadBuffer, dwRead);
-        ssRead << packet; // ストリーム文字列に流し込む
+        ssRead << packet;
     }
 
-    // ストリーム文字列を、出力文字列に変換
-    rstrResult = ssRead.str(); //.c_str();
+    rstrResult = ssRead.str();
 
-    //if( pszOptional ){ free( pszOptional ); }
     InternetCloseHandle(hInternetRequest);
     InternetCloseHandle(hInternetConnect);
     InternetCloseHandle(hInternetOpen);
     return true;
 
 LABEL_ERROR:
-    //if( pszOptional ){ free( pszOptional ); }
     InternetCloseHandle(hInternetRequest);
     InternetCloseHandle(hInternetConnect);
     InternetCloseHandle(hInternetOpen);
@@ -211,14 +197,14 @@ LABEL_ERROR:
 
 int main(int argc, char *argv[])
 {
-    tstring strUserAgent = _T("HttpRequestTest");
+    std::string strUserAgent = "HttpRequestTest";
     //tstring strUrl = _T("http://weather.livedoor.com/forecast/webservice/json/v1");
-    tstring strUrl = _T("https://www.google.com/");
+    std::string strUrl = "https://www.google.com/";
     bool bIsHttpVerbGet = true;
     //tstring strParameter = _T("city=400040");
-    tstring strParameter = _T("");
+    std::string strParameter = "";
 
-    tstring strResult;
+    std::string strResult;
     if (!HttpRequest(strUserAgent,
                      strUrl,
                      bIsHttpVerbGet,
@@ -228,10 +214,7 @@ int main(int argc, char *argv[])
         return false;
     }
 
-    //setlocale(LC_ALL, "Japanese");
     printf("%s\n", strResult.c_str());
-
-    _getch();
 
     return 0;
 }
