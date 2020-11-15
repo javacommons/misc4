@@ -9,11 +9,64 @@ using json = nlohmann::json;
 #include <iostream>
 #include <sstream>
 #include <iostream>
-#include <exception>
+//#include <exception>
 #include "base64.hpp"
 
 #include <time.h>
 #include <assert.h>
+
+#include "pipe.hpp"
+
+static HANDLE hPipe = INVALID_HANDLE_VALUE;
+static const char *client_program = NULL;
+
+int open_pipe_server(const char *name,
+                     const char *client)
+{
+  client_program = client;
+  std::cout << "(1)" << std::endl;
+  hPipe = create_pipe_server(name, 4096);
+  std::cout << "(2)" << std::endl;
+  if (hPipe == INVALID_HANDLE_VALUE)
+  {
+    std::cout << "(3)" << std::endl;
+    MessageBoxW(NULL, L"サーバーパイプの作成に失敗しました。", NULL, MB_ICONWARNING);
+    return false;
+  }
+  std::string cmdline = client_program;
+  cmdline += " ";
+  cmdline += name;
+  std::cout << cmdline << std::endl;
+  PROCESS_INFORMATION ps;
+  static STARTUPINFO si;
+  CreateProcessA(
+      NULL,
+      (LPSTR)cmdline.c_str(),
+      NULL,
+      NULL,
+      FALSE,
+      0,
+      NULL,
+      NULL,
+      &si,
+      &ps);
+  std::cout << "(4)" << std::endl;
+  ConnectNamedPipe(hPipe, NULL);
+  std::cout << "(5)" << std::endl;
+  return true;
+}
+
+const char *read_from_pipe()
+{
+  static TLS_VARIABLE_DECL std::string read;
+  read = read_string_from_pipe(hPipe);
+  return read.c_str();
+}
+
+void write_to_pipe(const char *s)
+{
+  write_string_to_pipe(hPipe, s);
+}
 
 int add(int x, int y)
 {
@@ -79,7 +132,7 @@ const char *apicall(const char *name, const char *base64_args)
   std::string packed_result = dummy.dump();
   std::string packed = base64_decode(std::string(base64_args));
   json json1 = json::from_msgpack(packed);
-  std::cout << "[API]" << api_name << " args=" <<  json1.dump() << std::endl;
+  std::cout << "[API]" << api_name << " args=" << json1.dump() << std::endl;
   std::string err;
   MsgPack obj = MsgPack::parse(packed, err);
   if (err != "")

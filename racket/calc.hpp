@@ -3,6 +3,10 @@ extern "C"
 {
 #endif
 
+  int open_pipe_server(const char *name,
+                       const char *client);
+  const char *read_from_pipe();
+  void write_to_pipe(const char *s);
   int add(int x, int y);
   int sub(int x, int y);
   void ref1(int *ret);
@@ -47,7 +51,8 @@ struct api1_output
         {"sum", this->sum},
         {"diff", this->diff},
         {"ts", this->ts},
-        {"bin", this->bin},};
+        {"bin", this->bin},
+    };
     return obj.dump();
   }
 };
