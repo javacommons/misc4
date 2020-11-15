@@ -17,7 +17,7 @@ inline HANDLE create_pipe_server(const std::string &name, DWORD buffer_size) {
     return hPipe;
 }
 
-inline HANDLE create_pipe_crient(const std::string &name) {
+inline HANDLE create_pipe_client(const std::string &name) {
     std::string pipe_name = std::string(R"(\\.\pipe\)") + name;
     HANDLE hPipe = CreateFileA(pipe_name.c_str(),
                                GENERIC_READ | GENERIC_WRITE,

@@ -56,6 +56,12 @@ unsigned long long open_pipe_server(const char *name,
   return (unsigned long long)hPipe;
 }
 
+unsigned long long open_pipe_client(const char *name)
+{
+  HANDLE hPipe = create_pipe_client(name);
+  return (unsigned long long)hPipe;
+}
+
 const char *read_from_pipe(unsigned long long hPipe)
 {
   static TLS_VARIABLE_DECL std::string read;
