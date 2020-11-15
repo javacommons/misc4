@@ -5,9 +5,9 @@
 (require msgpack)
 (require net/base64)
 
-(define-ffi-definer define-calc (ffi-lib "arch"))
+(define-ffi-definer define-arch (ffi-lib "arch"))
 
-(define-calc apicall (_fun _string/latin-1 _string/latin-1 -> _string/latin-1))
+(define-arch apicall (_fun _string/latin-1 _string/latin-1 -> _string/latin-1))
 
 (define (arch-api name args)
   (printf "api-name=~s args=~s\n" name args)

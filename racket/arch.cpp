@@ -42,7 +42,7 @@ double sum(const std::vector<double> &args)
   return result;
 }
 
-const char *apicall(const char *name, const char *base64_args)
+__declspec(dllexport) const char *apicall(const char *name, const char *base64_args)
 {
   std::string api_name = name;
   MsgPack dummy = false;

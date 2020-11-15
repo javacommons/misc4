@@ -2,6 +2,26 @@
 
 (require racket/gui)
 
+
+(require "call-api.rkt")
+
+(printf "Given arguments: ~s\n"
+        (current-command-line-arguments))
+
+(define api-input (hash "a" 11.11 "b" 22.22))
+api-input
+
+(call-api "api1" api-input)
+(println "bofore sum")
+(call-api "sum" '[11 99 33])
+(println "after sum")
+(call-api* "sum" 1 2 33)
+(call-api* "none" 1 "abc" 33)
+					;(call-api "sum" "dummy")
+
+(find-system-path 'run-file)
+
+
 (define frame (new frame%
                    [label "Example"]
                    [width 800]
