@@ -42,3 +42,4 @@ api-input
 (println "after sum")
 (call-api* "sum" 1 2 33)
 (call-api* "none" 1 "abc" 33)
+(call-api "sum" "dummy")

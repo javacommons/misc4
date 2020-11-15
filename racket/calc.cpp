@@ -1,3 +1,6 @@
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 #include "calc.hpp"
 #include "vardecl.h"
 #include <string>
@@ -6,6 +9,7 @@
 #include <iostream>
 #include <sstream>
 #include <iostream>
+#include <exception>
 #include "base64.hpp"
 
 #include <time.h>
@@ -71,6 +75,8 @@ const char *apicall(const char *name, const char *base64_args)
   MsgPack dummy = false;
   std::string packed_result = dummy.dump();
   std::string packed = base64_decode(std::string(base64_args));
+  json json1 = json::from_msgpack(packed);
+  std::cout << "[API]" << api_name << " args=" <<  json1.dump() << std::endl;
   std::string err;
   MsgPack obj = MsgPack::parse(packed, err);
   if (err != "")
@@ -84,7 +90,12 @@ const char *apicall(const char *name, const char *base64_args)
   else if (api_name == "sum")
   {
     if (!obj.is_array())
-      assert(0);
+    {
+      std::cout << "[api] " << api_name << std::endl;
+      show(obj);
+      //throw std::exception();
+      exit(1);
+    }
     std::vector<double> input;
     auto array = obj.array_items();
     for (auto it = array.begin(); it != array.end(); ++it)

@@ -148,9 +148,10 @@ void show_impl(MsgPack const& blob, int level) {
 
 void show(MsgPack const& blob ) {
     show_impl( blob, 0 );
-    std::cout << std::endl;
+    std::cout << std::endl << std::flush;
 }
 
+#if 0x0
 int main(int argc, char const *argv[]) {
     MsgPack obj = MsgPack::object {
         { "key1", "value1" },
@@ -182,3 +183,4 @@ int main(int argc, char const *argv[]) {
 
     return 0;
 }
+#endif
