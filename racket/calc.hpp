@@ -29,6 +29,28 @@ std::string pack_result(T x)
   return buffer.str();
 }
 
+struct api1_input
+{
+  double a;
+  double b;
+  MSGPACK_DEFINE(a, b);
+  api1_input(const msgpack::object &args)
+  {
+    ARGS_AS_MAP mmap = args.as<ARGS_AS_MAP>();
+    double a = mmap.find("a")->second.as<double>();
+    double b = mmap.find("b")->second.as<double>();
+    this->a = a;
+    this->b = b;
+  }
+};
+struct api1_output
+{
+  double sum;
+  double diff;
+  MSGPACK_DEFINE(sum, diff);
+};
+api1_output api1(const api1_input &input);
+
 double sum(const std::vector<double> &args);
 
 #endif

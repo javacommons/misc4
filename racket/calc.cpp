@@ -36,45 +36,16 @@ const char *hello(const char *name)
   return msg.c_str();
 }
 
-struct api1_input_type
+api1_output api1(const api1_input &input)
 {
-  double a;
-  double b;
-  MSGPACK_DEFINE(a, b);
-  api1_input_type(const msgpack::object &args)
-  {
-    ARGS_AS_MAP mmap = args.as<ARGS_AS_MAP>();
-    double a = mmap.find("a")->second.as<double>();
-    double b = mmap.find("b")->second.as<double>();
-    this->a = a;
-    this->b = b;
-  }
-};
-struct api1_result_type
-{
-  double sum;
-  double diff;
-  MSGPACK_DEFINE(sum, diff);
-};
-std::string api1(const msgpack::object &args)
-{
-#if 0x1
-  ARGS_AS_MAP mmap = args.as<ARGS_AS_MAP>();
-  double a = mmap.find("a")->second.as<double>();
-  double b = mmap.find("b")->second.as<double>();
-#else
-  api1_input_type input;
-  //args.convert(input);
-  input = args.as<api1_input_type>();
-  double a = input.a;
-  double b = input.b;
-#endif
-  std::cout << a << std::endl;
-  std::cout << b << std::endl;
-  api1_result_type result;
-  result.sum = a + b;
-  result.diff = a - b;
-  return pack_result(result);
+  //double a = input.a;
+  //double b = input.b;
+  //std::cout << a << std::endl;
+  //std::cout << b << std::endl;
+  api1_output result;
+  result.sum = input.a + input.b;
+  result.diff = input.a - input.b;
+  return result;
 }
 
 double sum(const std::vector<double> &args)
@@ -100,13 +71,16 @@ const char *apicall(const char *name, const char *base64_args)
   std::cout << "API=" << api_name << " args=" << args << std::endl;
   if (api_name == "api1")
   {
-    packed_result = api1(args);
+    api1_input input(args);
+    api1_output result = api1(input);
+    packed_result = pack_result(result);
   }
   else if (api_name == "sum")
   {
-    std::vector<double> api_args;
-    args.convert(api_args);
-    packed_result = pack_result(sum(api_args));
+    std::vector<double> input;
+    args.convert(input);
+    double result = sum(input);
+    packed_result = pack_result(result);
   }
   static TLS_VARIABLE_DECL std::string base64_result;
   base64_result = base64_encode(packed_result);
