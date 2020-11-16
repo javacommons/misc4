@@ -1,3 +1,4 @@
+#include "calc.hpp"
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
@@ -6,11 +7,7 @@ using json = nlohmann::json;
 #include <string>
 #include <vector>
 
-#include <stdio.h>
 #include "strconv.h"
-
-//#include "pipe.hpp"
-#include "calc.hpp"
 
 namespace ns
 {
@@ -63,6 +60,7 @@ int handle_pipe_events(const std::string &pipe_name)
         json value = packet["value"];
         std::cout << api_name << " " << value << std::endl;
         json output = api_persons();
+        output = 18446744073709551615ULL;
         std::cout << output << std::endl;
         write_to_pipe(hPipe, output.dump().c_str());
     }
@@ -101,6 +99,9 @@ int main(int, char **)
     std::cout << s << std::endl;
     unsigned long long ull = string_to_unsigned(s);
     std::cout << ull << std::endl;
+
+    json big = n;
+    std::cout << "big=" << big.dump() << std::endl;
 
     return 0;
 }
