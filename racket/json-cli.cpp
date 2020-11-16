@@ -9,7 +9,8 @@ using json = nlohmann::json;
 #include <stdio.h>
 #include "strconv.h"
 
-#include "pipe.hpp"
+//#include "pipe.hpp"
+#include "calc.hpp"
 
 namespace ns
 {
@@ -50,10 +51,10 @@ json api_persons(/*const json &input*/)
 
 int handle_pipe_events(const std::string &pipe_name)
 {
-    HANDLE hPipe = create_pipe_client(pipe_name);
+    /*HANDLE*/ unsigned long long hPipe = open_pipe_client(pipe_name.c_str());
     while (true)
     {
-        std::string input_json = read_string_from_pipe(hPipe);
+        std::string input_json = read_from_pipe(hPipe);
         std::cout << "input_json=" << input_json << std::endl;
         if (input_json.empty())
             break;
@@ -63,42 +64,9 @@ int handle_pipe_events(const std::string &pipe_name)
         std::cout << api_name << " " << value << std::endl;
         json output = api_persons();
         std::cout << output << std::endl;
-        write_string_to_pipe(hPipe, output.dump());
+        write_to_pipe(hPipe, output.dump().c_str());
     }
     return 0;
-}
-
-static inline std::string unsigned_to_string(unsigned long long n)
-{
-    return std::to_string(n);
-}
-
-static inline unsigned long long string_to_unsigned(const std::string &s)
-{
-    return std::stoull(s);
-}
-
-#if 0x1
-static inline void *unsigned_to_address(unsigned long long n)
-{
-    return (void *)n;
-}
-
-static inline unsigned long long address_to_unsigned(void *p)
-{
-    return (unsigned long long)p;
-}
-#endif
-
-static inline std::string address_to_string(void *p)
-{
-    unsigned long long n = (unsigned long long)p;
-    return std::to_string(n);
-}
-
-static inline void *string_to_address(const std::string &s)
-{
-    return (void *)std::stoull(s);
 }
 
 extern "C" void __wgetmainargs(int *, wchar_t ***, wchar_t ***, int, int *);
@@ -133,17 +101,6 @@ int main(int, char **)
     std::cout << s << std::endl;
     unsigned long long ull = string_to_unsigned(s);
     std::cout << ull << std::endl;
-
-    void *addr = unsigned_to_address(ull);
-    auto ull2 = address_to_unsigned(addr);
-    std::cout << ull2 << std::endl;
-
-    std::cout << address_to_string(addr) << std::endl;
-
-    void *addr2 = string_to_address(s);
-    std::cout << address_to_string(addr2) << std::endl;
-
-    HANDLE hdl = addr2;
 
     return 0;
 }
