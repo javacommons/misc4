@@ -7,6 +7,7 @@
        [$prefix "prefix"]
        ;[$client "racket.exe client.rkt"]
        [$client "json-cli.exe"]
+       ;[$client "json-cliXXX.exe"]
        [$debug 1]))
 (send $pipe-server get-name)
 (send $pipe-server get-hpipe)

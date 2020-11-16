@@ -17,6 +17,9 @@ using json = nlohmann::json;
 
 #include "pipe.hpp"
 
+#include "strconv.h"
+#include "vardecl.h"
+
 //static HANDLE hPipe = INVALID_HANDLE_VALUE;
 static const char *client_program = NULL;
 
@@ -34,15 +37,16 @@ unsigned long long open_pipe_server(const char *name,
     MessageBoxW(NULL, L"サーバーパイプの作成に失敗しました。", NULL, MB_ICONWARNING);
     return (unsigned long long)INVALID_HANDLE_VALUE;
   }
-  std::string cmdline = client_program;
-  cmdline += " ";
-  cmdline += name;
-  std::cout << cmdline << std::endl;
-  PROCESS_INFORMATION ps;
-  static STARTUPINFO si;
-  CreateProcessA(
+  std::wstring cmdline = utf8_to_wide(client_program);
+  cmdline += L" ";
+  cmdline += utf8_to_wide(name);
+  std::cout << wide_to_utf8(cmdline) << std::endl;
+  PROCESS_INFORMATION ps = {0};
+  /*static TLS_VARIABLE_DECL*/ STARTUPINFOW si = {0};
+  std::cout << "(1)" << std::endl;
+  WINBOOL b = CreateProcessW(
       NULL,
-      (LPSTR)cmdline.c_str(),
+      (LPWSTR)cmdline.c_str(),
       NULL,
       NULL,
       FALSE,
@@ -51,6 +55,15 @@ unsigned long long open_pipe_server(const char *name,
       NULL,
       &si,
       &ps);
+  std::cout << "(2)" << std::endl;
+  if (!b)
+  {
+    std::cout << "(3)" << std::endl;
+    assert(!"クライアントの起動に失敗");
+    std::cout << "Could not start client." << std::endl;
+    exit(1);
+  }
+  std::cout << "(4)" << std::endl;
   //std::cout << "(4)" << std::endl;
   ConnectNamedPipe(hPipe, NULL);
   //std::cout << "(5)" << std::endl;
@@ -109,6 +122,7 @@ const char *hello(const char *name)
   return msg.c_str();
 }
 
+#if 0x0
 api1_output api1(const api1_input &input)
 {
   api1_output output;
@@ -178,3 +192,4 @@ const char *apicall(const char *name, const char *base64_args)
   base64_result = base64_encode(packed_result);
   return base64_result.c_str();
 }
+#endif
