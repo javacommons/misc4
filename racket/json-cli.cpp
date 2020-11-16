@@ -9,16 +9,22 @@ using json = nlohmann::json;
 
 #include "strconv.h"
 
+typedef json (*json_function)(const json &input);
+
+json func1(const json &input)
+{
+    return 1234;
+}
+
 namespace ns
 {
-    // a simple struct to model a person
     struct person
     {
         std::string name;
         std::string address;
         int age;
     };
-} // namespace ns
+}
 
 namespace ns
 {
@@ -26,14 +32,13 @@ namespace ns
     {
         j = json{{"name", p.name}, {"address", p.address}, {"age", p.age}};
     }
-
     void from_json(const json &j, person &p)
     {
         j.at("name").get_to(p.name); // get_to(T& arg) は arg = get<T>() と同じ
         j.at("address").get_to(p.address);
         j.at("age").get_to(p.age);
     }
-} // namespace ns
+}
 
 json api_persons(/*const json &input*/)
 {
@@ -48,7 +53,9 @@ json api_persons(/*const json &input*/)
 
 int handle_pipe_events(const std::string &pipe_name)
 {
-    /*HANDLE*/ unsigned long long hPipe = open_pipe_client(pipe_name.c_str());
+    std::map<std::string, json_function> func_map;
+    func_map["func1"] = func1;
+    unsigned long long hPipe = open_pipe_client(pipe_name.c_str());
     while (true)
     {
         std::string input_json = read_from_pipe(hPipe);
