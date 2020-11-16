@@ -1,3 +1,6 @@
+#ifndef CALC_HPP
+#define CALC_HPP
+
 #include <windows.h>
 
 #ifdef __cplusplus
@@ -24,49 +27,4 @@ extern "C"
 } // extern "C" {
 #endif
 
-#ifdef __cplusplus
-
-//#include "msgpack11.hpp"
-//using namespace msgpack11;
-//#include "msgpack11_dump.hpp"
-
-#include <iostream>
-
-struct api1_input
-{
-  double a;
-  double b;
-  #if 0x0
-  api1_input(const MsgPack &obj)
-  {
-    double a = obj["a"].float64_value();
-    double b = obj["b"].float64_value();
-    this->a = a;
-    this->b = b;
-  }
-  #endif
-};
-struct api1_output
-{
-  double sum;
-  double diff;
-  std::string ts;
-  std::vector<uint8_t> bin;
-  #if 0x0
-  std::string pack()
-  {
-    MsgPack obj = MsgPack::object{
-        {"sum", this->sum},
-        {"diff", this->diff},
-        {"ts", this->ts},
-        {"bin", this->bin},
-    };
-    return obj.dump();
-  }
-  #endif
-};
-api1_output api1(const api1_input &input);
-
-double sum(const std::vector<double> &args);
-
-#endif
+#endif //CALC_HPP
