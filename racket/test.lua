@@ -24,7 +24,8 @@ const char *read_from_pipe(const char *hPipe);
 void write_to_pipe(const char *hPipe, const char *s);
 ]]
 
-local hPipe = calc.open_pipe_server("prefix", "json-cli.exe", 1)
+-- local hPipe = calc.open_pipe_server("prefix", "json-cli.exe", 1)
+local hPipe = ffi.string(calc.open_pipe_server("prefix", "json-cli.exe", 1))
 print(ffi.string(hPipe))
 calc.write_to_pipe(hPipe, "{\"name\": \"abc\", \"value\": 777}")
 local json = calc.read_from_pipe(hPipe);
