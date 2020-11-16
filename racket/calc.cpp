@@ -21,7 +21,8 @@ using json = nlohmann::json;
 static const char *client_program = NULL;
 
 unsigned long long open_pipe_server(const char *name,
-                                    const char *client)
+                                    const char *client,
+                                    int show_client)
 {
   client_program = client;
   std::cout << "(1)" << std::endl;
@@ -45,7 +46,7 @@ unsigned long long open_pipe_server(const char *name,
       NULL,
       NULL,
       FALSE,
-      0,
+      show_client ? 0 : CREATE_NO_WINDOW,
       NULL,
       NULL,
       &si,

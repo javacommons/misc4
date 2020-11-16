@@ -11,7 +11,17 @@
 (printf "Given arguments: ~s\n"
         (current-command-line-arguments))
 
-;(define $hPipe (::open-pipe-server $name "client.exe"))
 ;(::call-thru-pipe $hPipe "name1" '(11 22 "33"))
 
-(vector? (current-command-line-arguments))
+(define $args (current-command-line-arguments))
+(vector? $args)
+(vector-ref $args 0)
+(define $name (vector-ref $args 0))
+
+(define $hPipe (::open-pipe-client $name))
+$hPipe
+(::receive-input-thru-pipe $hPipe)
+(::return-output-thru-pipe $hPipe '("output1" 1 2 3))
+(::receive-input-thru-pipe $hPipe)
+(::return-output-thru-pipe $hPipe '("output2" 1 2 3))
+(println "end-of-client")

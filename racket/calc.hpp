@@ -6,7 +6,8 @@ extern "C"
 #endif
 
   unsigned long long open_pipe_server(const char *name,
-                                      const char *client);
+                                      const char *client,
+                                      int show_client);
   unsigned long long open_pipe_client(const char *name);
   const char *read_from_pipe(unsigned long long hPipe);
   void write_to_pipe(unsigned long long hPipe, const char *s);
