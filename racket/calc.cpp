@@ -11,8 +11,8 @@
 #include "vardecl.h"
 
 const char *open_pipe_server(const char *prefix,
-                                    const char *client,
-                                    int show_client)
+                             const char *client,
+                             int show_client)
 {
   FILETIME file_time;
   GetSystemTimeAsFileTime(&file_time);
