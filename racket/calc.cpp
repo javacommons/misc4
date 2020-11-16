@@ -1,25 +1,16 @@
 #include "calc.hpp"
 
-#include <nlohmann/json.hpp>
-using json = nlohmann::json;
+//#include <nlohmann/json.hpp>
+//using json = nlohmann::json;
 
 #include <string>
 #include <iostream>
-#include <sstream>
-#include <iostream>
-#include "base64.hpp"
-
-#include <time.h>
-#include <assert.h>
 
 #include "pipe.hpp"
-
 #include "strconv.h"
 #include "vardecl.h"
 
-//static const char *client_program = NULL;
-
-unsigned long long open_pipe_server(const char *prefix,
+const char *open_pipe_server(const char *prefix,
                                     const char *client,
                                     int show_client)
 {
@@ -38,7 +29,7 @@ unsigned long long open_pipe_server(const char *prefix,
   {
     //std::cout << "(3)" << std::endl;
     MessageBoxW(NULL, L"サーバーパイプの作成に失敗しました。", NULL, MB_ICONWARNING);
-    return (unsigned long long)INVALID_HANDLE_VALUE;
+    return "";
   }
   std::wstring cmdline = utf8_to_wide(client);
   cmdline += L" ";
@@ -62,7 +53,6 @@ unsigned long long open_pipe_server(const char *prefix,
   if (!b)
   {
     std::cout << "(3)" << std::endl;
-    assert(!"クライアントの起動に失敗");
     std::cout << "Could not start client." << std::endl;
     exit(1);
   }
@@ -70,23 +60,25 @@ unsigned long long open_pipe_server(const char *prefix,
   //std::cout << "(4)" << std::endl;
   ConnectNamedPipe(hPipe, NULL);
   //std::cout << "(5)" << std::endl;
-  return (unsigned long long)hPipe;
+  static TLS_VARIABLE_DECL std::string addr = address_to_string(hPipe);
+  return addr.c_str();
 }
 
-unsigned long long open_pipe_client(const char *name)
+const char *open_pipe_client(const char *name)
 {
   HANDLE hPipe = create_pipe_client(name);
-  return (unsigned long long)hPipe;
+  static TLS_VARIABLE_DECL std::string addr = address_to_string(hPipe);
+  return addr.c_str();
 }
 
-const char *read_from_pipe(unsigned long long hPipe)
+const char *read_from_pipe(const char *hPipe)
 {
   static TLS_VARIABLE_DECL std::string read;
-  read = read_string_from_pipe((HANDLE)hPipe);
+  read = read_string_from_pipe(string_to_address(hPipe));
   return read.c_str();
 }
 
-void write_to_pipe(unsigned long long hPipe, const char *s)
+void write_to_pipe(const char *hPipe, const char *s)
 {
-  write_string_to_pipe((HANDLE)hPipe, s);
+  write_string_to_pipe(string_to_address(hPipe), s);
 }

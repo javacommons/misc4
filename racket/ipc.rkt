@@ -8,10 +8,10 @@
 (require json)
 
 (define-ffi-definer define-calc (ffi-lib "calc"))
-(define-calc open_pipe_server (_fun _string _string _int -> _ullong))
-(define-calc open_pipe_client (_fun _string -> _ullong))
-(define-calc read_from_pipe(_fun _ullong -> _string))
-(define-calc write_to_pipe(_fun _ullong _string -> _void))
+(define-calc open_pipe_server (_fun _string _string _int -> _string))
+(define-calc open_pipe_client (_fun _string -> _string))
+(define-calc read_from_pipe(_fun _string -> _string))
+(define-calc write_to_pipe(_fun _string _string -> _void))
 
 (define (encode-input $name $value)
   (let* ([$input (hasheq 'name $name 'value $value)]
