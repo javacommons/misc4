@@ -66,8 +66,11 @@ int handle_pipe_events(const std::string &pipe_name)
         std::string api_name = packet["name"];
         json value = packet["value"];
         std::cout << api_name << " " << value << std::endl;
-        json output = api_persons();
-        output = 18446744073709551615ULL;
+        json result = api_persons();
+        result = 18446744073709551615ULL;
+        json output;
+        output["name"] = api_name;
+        output["value"] = result;
         std::cout << output << std::endl;
         write_to_pipe(hPipe, output.dump().c_str());
     }

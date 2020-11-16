@@ -55,7 +55,7 @@
    (init $prefix $client [$debug 0])
    (println (list $prefix $client $debug))
    (define $now (now))
-   (define $name (format "~a-~a" $prefix (~t $now "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSS")))
+   (define $name (format "~a:~a" $prefix (~t $now "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSS")))
    (define/public (get-name) $name)
    (define $hpipe (::open-pipe-server $name $client $debug))
    (define/public (get-hpipe) $hpipe)

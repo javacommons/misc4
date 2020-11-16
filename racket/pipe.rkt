@@ -11,7 +11,7 @@
        [$debug 1]))
 (send $pipe-server get-name)
 (send $pipe-server get-hpipe)
-(send $pipe-server call-api "name0" (hash 'a 123 'b 456.7))
+(send $pipe-server call-api "name0" (hash 'a 18446744073709551615 'b 456.7))
 (send $pipe-server dbg "debug メッセージ")
 (send $pipe-server dbg '("abc" xyz "debug メッセージ"))
 
