@@ -66,9 +66,33 @@
    (define/public (call-api $api $value)
      (dbg (format "[call-api] $api=~s $value=~s" $api $value))
      (let* ([$output (::call-thru-pipe $hpipe $api $value)])
-       (dbg (format "===> ~s" $output))
+       (dbg (format "<=== ~s" $output))
        $output
        )
+     )
+   )
+  )
+
+(define ::pipe-client%
+  (class
+   object%
+   (super-new)
+   (init $name)
+   (println $name)
+   (define $pipe-name $name)
+   (define/public (get-name) $pipe-name)
+   (define $hpipe (::open-pipe-client $name))
+   (define/public (get-hpipe) $hpipe)
+   (define/public (dbg $msg) (printf "[~s] ~a\n" $pipe-name $msg))
+   (define/public (receive)
+     (let* ([$input (::receive-input-thru-pipe $hpipe)])
+       (dbg (format "===> ~s" $input))
+       $input
+       )
+     )
+   (define/public (return $output)
+     (dbg (format "<=== ~s" $output))
+     (::return-output-thru-pipe $hpipe $output)
      )
    )
   )
@@ -79,4 +103,5 @@
  ::call-thru-pipe
  ::receive-input-thru-pipe
  ::return-output-thru-pipe
- ::pipe-server%)
+ ::pipe-server%
+ ::pipe-client%)
