@@ -19,7 +19,7 @@
 ;; 	 [$base64-input (base64-encode $packed-input #"")])
 ;;     $base64-input))
 (define (encode-input $name $value)
-  (let* ([$input (hash 'name $name 'value $value)]
+  (let* ([$input (hasheq 'name $name 'value $value)]
 	 [$json (jsexpr->string $input)])
     $json))
 
