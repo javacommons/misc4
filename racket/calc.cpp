@@ -19,10 +19,17 @@ using json = nlohmann::json;
 
 //static const char *client_program = NULL;
 
-unsigned long long open_pipe_server(const char *name,
+unsigned long long open_pipe_server(const char *prefix,
                                     const char *client,
                                     int show_client)
 {
+  FILETIME file_time;
+  GetSystemTimeAsFileTime(&file_time);
+  ULONGLONG ull = (ULONGLONG)file_time.dwHighDateTime << 32 | file_time.dwLowDateTime;
+  std::string name = prefix;
+  name += ":";
+  name += std::to_string(ull);
+
   //client_program = client;
   //std::cout << "(1)" << std::endl;
   HANDLE hPipe = create_pipe_server(name, 4096);

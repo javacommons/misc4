@@ -9,6 +9,8 @@ using json = nlohmann::json;
 
 #include "strconv.h"
 
+#include <time.h>
+
 typedef json (*json_function)(const json &input);
 
 json func1(const json &input)
@@ -24,7 +26,7 @@ namespace ns
         std::string address;
         int age;
     };
-}
+} // namespace ns
 
 namespace ns
 {
@@ -38,7 +40,7 @@ namespace ns
         j.at("address").get_to(p.address);
         j.at("age").get_to(p.age);
     }
-}
+} // namespace ns
 
 json api_persons(/*const json &input*/)
 {
@@ -77,6 +79,14 @@ int handle_pipe_events(const std::string &pipe_name)
     return 0;
 }
 
+static inline ULONGLONG get_time_stamp()
+{
+    FILETIME file_time;
+    GetSystemTimeAsFileTime(&file_time);
+	ULONGLONG ull = (ULONGLONG)file_time.dwHighDateTime << 32 | file_time.dwLowDateTime;
+    return ull;
+}
+
 extern "C" void __wgetmainargs(int *, wchar_t ***, wchar_t ***, int, int *);
 int main(int, char **)
 {
@@ -112,6 +122,26 @@ int main(int, char **)
 
     json big = n;
     std::cout << "big=" << big.dump() << std::endl;
+
+    //SYSTEMTIME systime;
+    //GetSystemTime(&systime);
+
+    FILETIME file_time;
+    GetSystemTimeAsFileTime(&file_time);
+
+	ULONGLONG ll;
+	ll = (ULONGLONG)file_time.dwHighDateTime << 32 | file_time.dwLowDateTime;
+
+#if 0x0
+    time_t t = time(NULL);
+    struct tm tm;
+    char str[81];
+    localtime_s(&tm, &t);
+    strftime(str, sizeof(str), "%Y-%m-%d %H:%I:%S", &tm);
+    printf("%s\n", str);
+#endif
+    std::cout << get_time_stamp() << std::endl;
+
 
     return 0;
 }

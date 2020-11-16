@@ -8,7 +8,7 @@ extern "C"
 {
 #endif
 
-  unsigned long long open_pipe_server(const char *name,
+  unsigned long long open_pipe_server(const char *prefix,
                                       const char *client,
                                       int show_client);
   unsigned long long open_pipe_client(const char *name);
