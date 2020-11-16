@@ -67,6 +67,16 @@ int handle_pipe_events(const std::string &pipe_name)
     return 0;
 }
 
+std::string unsigned_to_string(unsigned long long n)
+{
+    return std::to_string(n);
+}
+
+unsigned long long string_to_unsigned(const std::string &s)
+{
+    return std::stoull(s);
+}
+
 extern "C" void __wgetmainargs(int *, wchar_t ***, wchar_t ***, int, int *);
 int main(int, char **)
 {
@@ -92,6 +102,18 @@ int main(int, char **)
 
     json output = api_persons();
     std::cout << output << std::endl;
+
+#if 0x1
+    auto n = 18446744073709551615ULL;
+    std::string s = unsigned_to_string(n);
+    std::cout << s << std::endl;
+#else
+    printf("n=%llu\n", 18446744073709551615);
+#endif
+    //unsigned long long ull = std::stoull(s);
+    unsigned long long ull = string_to_unsigned(s);
+    std::cout << ull << std::endl;
+
 
     return 0;
 }
