@@ -51,9 +51,32 @@
   (write_to_pipe $hPipe (encode-output $value))
   )
 
+(define ::pipe-server%
+  (class
+   object%
+   (super-new)
+   (init $prefix $client [$debug 0])
+   (println (list $prefix $client $debug))
+   (define $now (now))
+   (define $name (format "~a-~a" $prefix (~t $now "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSS")))
+   (define/public (get-name) $name)
+   (define $hpipe (::open-pipe-server $name $client $debug))
+   (define/public (get-hpipe) $hpipe)
+   (define/public (dbg $msg) (printf "[server] ~a\n" $msg))
+   (define/public (call-api $api $value)
+     (dbg (format "[call-api] $api=~s $value=~s" $api $value))
+     (let* ([$output (::call-thru-pipe $hpipe $api $value)])
+       (dbg (format "===> ~s" $output))
+       $output
+       )
+     )
+   )
+  )
+
 (provide
  ::open-pipe-server
  ::open-pipe-client
  ::call-thru-pipe
  ::receive-input-thru-pipe
- ::return-output-thru-pipe)
+ ::return-output-thru-pipe
+ ::pipe-server%)

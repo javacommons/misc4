@@ -25,12 +25,12 @@ unsigned long long open_pipe_server(const char *name,
                                     int show_client)
 {
   client_program = client;
-  std::cout << "(1)" << std::endl;
+  //std::cout << "(1)" << std::endl;
   HANDLE hPipe = create_pipe_server(name, 4096);
-  std::cout << "(2)" << std::endl;
+  //std::cout << "(2)" << std::endl;
   if (hPipe == INVALID_HANDLE_VALUE)
   {
-    std::cout << "(3)" << std::endl;
+    //std::cout << "(3)" << std::endl;
     MessageBoxW(NULL, L"サーバーパイプの作成に失敗しました。", NULL, MB_ICONWARNING);
     return (unsigned long long)INVALID_HANDLE_VALUE;
   }
@@ -51,9 +51,9 @@ unsigned long long open_pipe_server(const char *name,
       NULL,
       &si,
       &ps);
-  std::cout << "(4)" << std::endl;
+  //std::cout << "(4)" << std::endl;
   ConnectNamedPipe(hPipe, NULL);
-  std::cout << "(5)" << std::endl;
+  //std::cout << "(5)" << std::endl;
   return (unsigned long long)hPipe;
 }
 
