@@ -14,4 +14,6 @@ $home-dir
 (define $target-dir (send $pd result))
 $target-dir
 
-(new set-path% [:member $target-dir])
+(define $bin-dir (build-path $target-dir "bin"))
+
+(new set-path% [:member $bin-dir])
