@@ -19,3 +19,23 @@
 (get-registry-env "USER" "PATH")
 (define path (get-registry-env "USER" "PATH"))
 (set-registry-env! "USER" "PATH2" (format "~a;~a" path "X:\\somewhere"))
+
+#|
+    function createShorcut2(used, dir, name, icon, target, args) {
+      var scPath = dir + "\\" + name + ".lnk";
+      if (!used) {
+        deleteFile(scPath);
+        return;
+      }
+      var shell = new ActiveXObject("WScript.Shell");
+      var sc = shell.CreateShortcut(scPath);
+      sc.IconLocation = icon;
+      sc.TargetPath = target;
+      sc.Arguments = args;
+      sc.WorkingDirectory = "";
+      sc.Save();
+    }
+|#
+
+(define $wshell (com-create-instance "WScript.Shell" 'local))
+$wshell
