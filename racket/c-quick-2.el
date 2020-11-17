@@ -96,6 +96,9 @@
              (list 'racket-mode *cq-lexer-for-lisp*))
 
 (add-to-list 'cq-lexer-alist
+             (list 'racket-repl-mode *cq-lexer-for-lisp*))
+
+(add-to-list 'cq-lexer-alist
              (list 'clojure-mode *cq-lexer-for-lisp*))
 
 (add-to-list 'cq-lexer-alist
