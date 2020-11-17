@@ -65,5 +65,7 @@
   )
 
 (provide
+  get-registry-env
+  set-registry-env!
   prepare-dir%
   set-path%)
