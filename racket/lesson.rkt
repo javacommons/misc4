@@ -42,11 +42,11 @@
   (class
    object% (super-new)
    (init :width :height)
-   (define %width :width)
-   (define %height :height)
-   (define/public (:get-width) %width)
-   (define/public (:set-width n) (set! %width n))
-   (define/public (:area) (* %width %height))
+   (define $width :width)
+   (define $height :height)
+   (define/public (:get-width) $width)
+   (define/public (:set-width %n) (set! $width %n))
+   (define/public (:area) (* $width $height))
    )
   )
 
@@ -55,3 +55,15 @@
 (send $rect :area)
 (send $rect :set-width 5)
 (send $rect :area)
+
+(define (square %n #:bonus [%bonus 0]) (+ (* %n %n) %bonus))
+(square 100)
+(square 100 #:bonus 123)
+(square #:bonus 4567 100)
+
+(define (test %x #:bonus %bonus)
+  (println %x)
+  (println %bonus)
+  )
+
+(test 123 #:bonus 456)

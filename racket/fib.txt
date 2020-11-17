@@ -23,12 +23,17 @@ real    0m6.823s
 user    0m0.000s
 sys     0m0.031s
 
-javac@win10-64bit-03 MINGW64 /c/Users/javac/Documents/misc4/racket
 $ gsc -exe fib
 
-javac@win10-64bit-03 MINGW64 /c/Users/javac/Documents/misc4/racket
 $ time ./fib.exe
 
 real    0m49.833s
+user    0m0.000s
+sys     0m0.000s
+
+$ time ./luajit.exe fib.lua 
+1134903170
+
+real    0m12.506s
 user    0m0.000s
 sys     0m0.000s
