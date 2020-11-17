@@ -7,7 +7,8 @@ $home-dir
 
 (define $pd (new prepare-dir%
 		 [:root-dir $home-dir]
-		 [:zip-base "racket-7.9-64bit"]
+		 ;[:zip-path "racket-7.9-64bit.zip"]
+		 [:zip-base "VSCode-win32-x64-1.51.1"]
      ))
 
 (define $target-dir (send $pd result))
