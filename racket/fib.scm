@@ -1,5 +1,3 @@
-#lang racket
-
 ; Source: https://satosystems.hatenablog.com/entry/20121228/1356655565
 
 (define (fib n)

@@ -1,3 +1,4 @@
+// Source: https://satosystems.hatenablog.com/entry/20121228/1356655565
 #include <stdio.h>
 
 int fib(int n) {
