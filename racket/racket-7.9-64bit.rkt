@@ -2,7 +2,9 @@
 
 (require "zip-install.rkt")
 
-(define $home-dir (find-system-path 'home-dir))
+;(define $home-dir (find-system-path 'home-dir))
+;(define $home-dir "C:\\Users\\Public")
+(define $home-dir "C:\\")
 $home-dir
 
 (define $pd (new prepare-dir%
