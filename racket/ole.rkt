@@ -37,5 +37,14 @@
     }
 |#
 
-(define $wshell (com-create-instance "WScript.Shell" 'local))
-$wshell
+(define create-simple-shortcut%
+  (class object% (super-new)
+    (init :shortcut-path :target-path)
+    (define $wshell (com-create-instance "WScript.Shell" 'local))
+    (define $sc (com-invoke $wshell "CreateShortcut" :shortcut-path))
+    (com-set-property! $sc "TargetPath" :target-path)
+    (com-invoke $sc "Save")
+    )
+  )
+
+(new create-simple-shortcut% [:shortcut-path "tmp2.lnk"] [:target-path "C:\\Windows\\System32\\notepad.exe"])

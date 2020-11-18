@@ -16,3 +16,20 @@ $sendto-dir
 
 (directory-list $sendto-dir #:build? #t)
 (directory-list $sendto-dir #:build? #f)
+
+(require ffi/com)
+
+(define create-simple-shortcut%
+  (class object% (super-new)
+    (init :shortcut-path :target-path)
+    (define $wshell (com-create-instance "WScript.Shell" 'local))
+    (define $sc (com-invoke $wshell "CreateShortcut" :shortcut-path))
+    (com-set-property! $sc "TargetPath" :target-path)
+    (com-invoke $sc "Save")
+    )
+  )
+
+(define $shortcut-path (path->string (build-path $sendto-dir "Notepad.lnk")))
+(new create-simple-shortcut%
+     [:shortcut-path $shortcut-path]
+     [:target-path "C:\\Windows\\System32\\notepad.exe"])

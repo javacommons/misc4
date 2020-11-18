@@ -67,3 +67,13 @@
   )
 
 (test 123 #:bonus 456)
+
+(require json)
+
+(define n (/ 1 3))
+n
+
+(jsexpr->string (exact->inexact n))
+
+(/ 1.0 3.0)
+(exact->inexact 0.2)

@@ -64,8 +64,19 @@
    )
   )
 
+(define create-simple-shortcut%
+  (class object% (super-new)
+    (init :shortcut-path :target-path)
+    (define $wshell (com-create-instance "WScript.Shell" 'local))
+    (define $sc (com-invoke $wshell "CreateShortcut" :shortcut-path))
+    (com-set-property! $sc "TargetPath" :target-path)
+    (com-invoke $sc "Save")
+    )
+  )
+
 (provide
   get-registry-env
   set-registry-env!
   prepare-dir%
-  set-path%)
+  set-path%
+  create-simple-shortcut%)
