@@ -1,3 +1,4 @@
+@echo OFF
 setlocal
 set PATH=PATH=C:\Users\user\.software\msys64\mingw64\bin;C:\Users\user\.software\msys64\usr\local\bin;C:\Users\user\.software\msys64\usr\bin;%PATH%
 set MINGW_CHOST=x86_64-w64-mingw32
