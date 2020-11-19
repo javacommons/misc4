@@ -27,3 +27,4 @@ $list1
 (define $list2 (map (lambda (%x) (string-replace %x "\\\\" "\\")) $list1))
 $list2
 (string-join $list2 ";")
+(set-registry-env! "USER" "PATH" (string-join $list2 ";"))
