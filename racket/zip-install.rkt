@@ -17,7 +17,7 @@
     (com-release %wshell)
     (get-registry-env %scope %name)))
 
-(define (delete-registry-env %scope %name)
+(define (delete-registry-env! %scope %name)
   (let* ([%wshell (com-create-instance "WScript.Shell" 'local)]
          [%env (com-get-property* %wshell "Environment" %scope)]
          [%temp1 (println(com-methods %env))]
@@ -85,7 +85,7 @@
 (provide
   get-registry-env
   set-registry-env!
-  delete-registry-env
+  delete-registry-env!
   prepare-dir%
   set-path%
   create-simple-shortcut%)
