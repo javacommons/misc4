@@ -3,6 +3,29 @@
 (require file/unzip)
 (require ffi/com)
 
+(define (get-registry-env %scope %name)
+  (let* ([%wshell (com-create-instance "WScript.Shell" 'local)]
+         [%env (com-get-property* %wshell "Environment" %scope)]
+         [%result (com-get-property %env (list "Item" %name))])
+    (com-release %wshell)
+    %result))
+
+(define (set-registry-env! %scope %name %value)
+  (let* ([%wshell (com-create-instance "WScript.Shell" 'local)]
+         [%env (com-get-property* %wshell "Environment" %scope)])
+    (com-set-property! %env (list "Item" %name) %value)
+    (com-release %wshell)
+    (get-registry-env %scope %name)))
+
+(define (delete-registry-env %scope %name)
+  (let* ([%wshell (com-create-instance "WScript.Shell" 'local)]
+         [%env (com-get-property* %wshell "Environment" %scope)]
+         [%tem1 (println(com-methods %env))]
+         [%result (com-get-property %env (list "Item" %name))])
+    (if (equal? "" %result) (void) (com-invoke %env "Remove" %name))
+    (com-release %wshell)
+    %result))
+
 (define prepare-dir%
   (class
    object%
@@ -23,25 +46,10 @@
      (println "unzip start")
      (unzip $file-in)
      (println "unzip end")])
-   (define/public (result)
+   (define/public (:get-target-dir)
      $target-dir)
    )
   )
-
-(define (get-registry-env scope name)
-  (let* ([wshell (com-create-instance "WScript.Shell" 'local)]
-         [env (com-get-property* wshell "Environment" scope)]
-         [result (com-get-property env (list "Item" name))])
-    (com-release wshell)
-    result))
-
-(define (set-registry-env! scope name value)
-  (let* ([wshell (com-create-instance "WScript.Shell" 'local)]
-         [env (com-get-property* wshell "Environment" scope)])
-    (com-set-property! env (list "Item" name) value)
-    (com-release wshell)
-    (get-registry-env scope name)))
-
 
 (define set-path%
   (class
@@ -77,6 +85,7 @@
 (provide
   get-registry-env
   set-registry-env!
+  delete-registry-env
   prepare-dir%
   set-path%
   create-simple-shortcut%)
