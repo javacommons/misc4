@@ -2,8 +2,7 @@
 solution "Hello Premake"
 
   configurations { "Release", "Debug" }
-  -- platforms { "x32", "x64" }
-  platforms { "x64", "x32" }
+  platforms { "native", "x64", "x32" }
 
   project "calc"
     -- https://github.com/premake/premake-core/wiki/kind
