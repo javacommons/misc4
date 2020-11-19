@@ -2,6 +2,8 @@
 solution "Hello Premake"
 
   configurations { "Release", "Debug" }
+  -- platforms { "x32", "x64" }
+  platforms { "x64", "x32" }
 
   project "calc"
     -- https://github.com/premake/premake-core/wiki/kind
@@ -27,11 +29,16 @@ solution "Hello Premake"
       "opengl32", "glu32"
     }
     linkoptions { "-static", "-Wl,-allow-multiple-definition" }
+
     configuration "Debug"
       defines { "DEBUG" }
       flags { "Symbols" }
-      targetsuffix "-d"
-
+      --targetsuffix "-d"
     configuration "Release"
       defines { "NDEBUG" }
       flags { "Optimize" }
+
+    configuration "x32"
+      targetsuffix "-32bit"
+    configuration "x64"
+      targetsuffix "-64bit"
