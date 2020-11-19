@@ -32,24 +32,3 @@ $path-list
     %result))
 
 (delete-registry-env "USER" "MSYSTEM_CARCH")
-
-#;(define set-path%
-  (class
-   object% (super-new)
-   (init :member)
-   (define %member (if (path? :member) (path->string :member) :member))
-   (println %member)
-   (set! %member (string-replace %member "/" "\\"))
-   (println %member)
-   (define %path (get-registry-env "USER" "PATH"))
-   (println %path)
-   (define %path-list (string-split %path ";"))
-   (println %path-list)
-   (set! %path-list (cons %member %path-list))
-   (set! %path-list (remove-duplicates %path-list equal?))
-   (println %path-list)
-   (set! %path (string-join %path-list ";"))
-   (println %path)
-   (set-registry-env! "USER" "PATH" %path)
-   )
-  )
